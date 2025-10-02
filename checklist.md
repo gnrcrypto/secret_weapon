@@ -37,10 +37,10 @@
 - [ ] **src/adapters/priceOracleAdapter.ts** - Price feed readers
 - [ ] **src/adapters/orderbookAdapter.ts** - Optional CEX connectors
 
-### Arbitrage Engine
-- [ ] **src/arb/pathfinder.ts** - Generate candidate arbitrage paths
-- [ ] **src/arb/simulator.ts** - Simulate swaps without submitting
-- [ ] **src/arb/strategy.ts** - Decision logic for opportunity selection
+### Arbitrage Engine ✅ PHASE 2 COMPLETE
+- [x] **src/arb/pathfinder.ts** - Token graph construction and path discovery
+- [x] **src/arb/simulator.ts** - Trade simulation with gas and slippage calculations
+- [x] **src/arb/strategy.ts** - Opportunity ranking and position sizing
 
 ### Execution Layer
 - [ ] **src/exec/txBuilder.ts** - Build transaction payloads
@@ -96,7 +96,7 @@
 - **Foundation**: 7/7 files ✅ (100%)
 - **Utilities**: 2/2 files ✅ (100%) 
 - **Adapters**: 2/3 files ✅ (67%)
-- **Arbitrage Logic**: 0/3 files (0%)
+- **Arbitrage Logic**: 3/3 files ✅ (100%)
 - **Execution**: 0/3 files (0%)
 - **Risk**: 0/1 files (0%)
 - **Database**: 0/5 files (0%)
@@ -107,7 +107,7 @@
 - **Docs**: 0/2 files (0%)
 
 ### Overall Progress:
-**11 of 40 files completed (27.5%)**
+**14 of 40 files completed (35%)**
 
 ## ✅ Phase 1: Core Trading Logic - COMPLETE!
 
@@ -140,6 +140,32 @@
    - Price aggregation from multiple sources
    - Price validation and staleness checks
    - Caching with TTL for performance
+
+## ✅ Phase 2: Arbitrage Detection - COMPLETE!
+
+### What we built in Phase 2:
+1. **Pathfinder (`pathfinder.ts`):**
+   - Token graph construction for network analysis
+   - Triangular arbitrage path discovery
+   - Cross-DEX arbitrage detection
+   - Path caching for performance
+   - Multi-hop path enumeration
+
+2. **Simulator (`simulator.ts`):**
+   - On-chain simulation without execution
+   - Flash loan integration (Aave, Balancer, DODO)
+   - Gas cost estimation and optimization
+   - Price impact calculations
+   - MEV protection simulation
+   - Confidence scoring system
+
+3. **Strategy (`strategy.ts`):**
+   - Opportunity ranking algorithm
+   - Kelly Criterion position sizing
+   - Risk-based trade filtering
+   - Dynamic strategy adjustment
+   - Concurrent trade management
+   - Market condition adaptation
 
 ## 🎯 Recommended Next Steps (Priority Order)
 
