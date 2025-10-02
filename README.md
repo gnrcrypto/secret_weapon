@@ -46,8 +46,8 @@ A production-grade arbitrage bot for the Polygon network with flashloan support,
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd polygon-arbitrage-bot
+git clone https://github.com/gnrcrypto/secret_weapon/
+cd secret_weapon
 ```
 
 2. Install dependencies:
