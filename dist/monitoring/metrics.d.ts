@@ -25,7 +25,6 @@ export declare class MetricsService {
     private priceImpactHistogram;
     private simulationTimeHistogram;
     constructor();
-    private initializeMetrics;
     private setupEndpoints;
     /**
      * Start metrics server

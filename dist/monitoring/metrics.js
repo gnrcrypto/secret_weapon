@@ -51,12 +51,7 @@ class MetricsService {
     constructor() {
         this.register = new prom_client_1.Registry();
         this.app = (0, express_1.default)();
-        this.initializeMetrics();
-        this.setupEndpoints();
-        // Collect default metrics (CPU, memory, etc.)
-        (0, prom_client_1.collectDefaultMetrics)({ register: this.register });
-    }
-    initializeMetrics() {
+        // Initialize metrics (definite assignment)
         // Counters
         this.opportunitiesFound = new prom_client_1.Counter({
             name: 'arb_opportunities_found_total',
@@ -180,21 +175,25 @@ class MetricsService {
             buckets: [10, 25, 50, 100, 250, 500, 1000],
             registers: [this.register],
         });
+        // Setup endpoints
+        this.setupEndpoints();
+        // Collect default metrics (CPU, memory, etc.)
+        (0, prom_client_1.collectDefaultMetrics)({ register: this.register });
     }
     setupEndpoints() {
         // Metrics endpoint for Prometheus
-        this.app.get('/metrics', async (req, res) => {
+        this.app.get('/metrics', async (_req, res) => {
             res.set('Content-Type', this.register.contentType);
-            res.send(await this.register.metrics());
+            return res.send(await this.register.metrics());
         });
         // Health check endpoint
-        this.app.get('/health', (req, res) => {
-            res.json({ status: 'ok', timestamp: new Date().toISOString() });
+        this.app.get('/health', (_req, res) => {
+            return res.json({ status: 'ok', timestamp: new Date().toISOString() });
         });
         // Custom dashboard data endpoint
-        this.app.get('/dashboard', async (req, res) => {
+        this.app.get('/dashboard', async (_req, res) => {
             const metrics = await this.getDashboardData();
-            res.json(metrics);
+            return res.json(metrics);
         });
     }
     /**

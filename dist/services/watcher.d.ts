@@ -42,4 +42,17 @@ export declare class MarketWatcher extends EventEmitter {
     getStatus(): WatcherStatus;
     getPerformanceMetrics(): object;
 }
+/**
+ * Factory helper used by other modules that expect a createWatcher function.
+ * Returns an object exposing start/stop (wrapping the MarketWatcher instance).
+ */
+export declare function createWatcher(dataSource: DataSource): {
+    start: () => Promise<void>;
+    stop: () => Promise<void>;
+    on: (event: string, handler: (...args: any[]) => void) => MarketWatcher;
+    pause: () => void;
+    resume: () => void;
+    getStatus: () => WatcherStatus;
+    getPerformanceMetrics: () => object;
+};
 //# sourceMappingURL=watcher.d.ts.map

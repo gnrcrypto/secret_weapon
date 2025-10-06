@@ -88,10 +88,10 @@ class HealthAPI {
             try {
                 const health = await this.getHealthStatus();
                 const statusCode = health.isHealthy ? 200 : 503;
-                res.status(statusCode).json(health);
+                return res.status(statusCode).json(health);
             }
             catch (error) {
-                res.status(503).json({
+                return res.status(503).json({
                     isHealthy: false,
                     error: error instanceof Error ? error.message : 'Unknown error',
                 });
@@ -103,10 +103,10 @@ class HealthAPI {
         this.app.get('/metrics', async (_req, res) => {
             try {
                 const metrics = await this.getDetailedMetrics();
-                res.json(metrics);
+                return res.json(metrics);
             }
             catch (error) {
-                res.status(500).json({ error: 'Failed to get metrics' });
+                return res.status(500).json({ error: 'Failed to get metrics' });
             }
         });
         /**
@@ -122,7 +122,7 @@ class HealthAPI {
                 catch (e) { /* swallow */ }
             }
             logger.warn('Trading paused via API');
-            res.json({ status: 'paused', message: 'Trading has been paused' });
+            return res.json({ status: 'paused', message: 'Trading has been paused' });
         });
         /**
          * Resume trading
@@ -130,7 +130,7 @@ class HealthAPI {
         this.app.post('/resume', (_req, res) => {
             this.isPaused = false;
             logger.info('Trading resumed via API');
-            res.json({ status: 'active', message: 'Trading has been resumed' });
+            return res.json({ status: 'active', message: 'Trading has been resumed' });
         });
         /**
          * Simulate trade
@@ -145,7 +145,7 @@ class HealthAPI {
                 const { getSimulator } = await Promise.resolve().then(() => __importStar(require('../arb/simulator')));
                 const simulator = getSimulator();
                 const result = await simulator.simulatePathOnChain(path, BigInt(amount));
-                res.json({
+                return res.json({
                     isProfitable: result.isProfitable,
                     netProfitUsd: result.netProfitUsd,
                     priceImpact: result.priceImpact,
@@ -153,7 +153,8 @@ class HealthAPI {
                 });
             }
             catch (error) {
-                res.status(500).json({ error: 'Simulation failed' });
+                logger.error('Simulation failed:', error?.message || error);
+                return res.status(500).json({ error: 'Simulation failed' });
             }
         });
         /**
@@ -174,7 +175,7 @@ class HealthAPI {
                 },
                 addresses: config_1.ADDRESSES,
             };
-            res.json(sanitized);
+            return res.json(sanitized);
         });
         /**
          * Get wallet info
@@ -188,14 +189,14 @@ class HealthAPI {
                 const balance = typeof polygonProvider_1.wallet.getBalance === 'function'
                     ? await polygonProvider_1.wallet.getBalance()
                     : BigInt(0);
-                res.json({
+                return res.json({
                     address,
                     balanceMatic: ethers_1.ethers.formatEther(balance),
                     network: config_1.Config.network.chainId,
                 });
             }
             catch (error) {
-                res.status(500).json({ error: 'Failed to get wallet info' });
+                return res.status(500).json({ error: 'Failed to get wallet info' });
             }
         });
         /**
@@ -210,7 +211,7 @@ class HealthAPI {
             if (typeof riskManager.getMetrics === 'function') {
                 return res.json(riskManager.getMetrics());
             }
-            res.status(500).json({ error: 'Risk manager not available' });
+            return res.status(500).json({ error: 'Risk manager not available' });
         });
         /**
          * Get execution status
@@ -219,10 +220,10 @@ class HealthAPI {
             try {
                 const executor = (0, executor_1.getExecutor)();
                 const status = executor.getStatus();
-                res.json(status);
+                return res.json(status);
             }
             catch (error) {
-                res.status(500).json({ error: 'Executor not available' });
+                return res.status(500).json({ error: 'Executor not available' });
             }
         });
         /**
@@ -232,10 +233,10 @@ class HealthAPI {
             try {
                 const strategy = (0, strategy_1.getStrategy)();
                 const metrics = strategy.getMetrics();
-                res.json(metrics);
+                return res.json(metrics);
             }
             catch (error) {
-                res.status(500).json({ error: 'Strategy not available' });
+                return res.status(500).json({ error: 'Strategy not available' });
             }
         });
         /**
@@ -243,7 +244,7 @@ class HealthAPI {
          */
         this.app.post('/emergency-stop', (_req, res) => {
             this.emergencyStop();
-            res.json({ status: 'stopped', message: 'Emergency stop activated' });
+            return res.json({ status: 'stopped', message: 'Emergency stop activated' });
         });
         /**
          * Get system logs
@@ -252,7 +253,7 @@ class HealthAPI {
             const limit = parseInt(req.query.limit || '100', 10) || 100;
             const level = req.query.level || 'info';
             // This would typically read from a log file or database
-            res.json({
+            return res.json({
                 message: 'Log endpoint not fully implemented',
                 limit,
                 level,

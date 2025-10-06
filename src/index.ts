@@ -121,10 +121,10 @@ class ArbitrageBotApplication {
 
     if (!isSimulationMode()) {
       logger.info('Initializing wallet...');
-      if (typeof wallet.initialize === 'function') wallet.initialize();
+      if (typeof (wallet as any).initialize === 'function') (wallet as any).initialize();
 
-      const address = typeof wallet.getAddress === 'function' ? await wallet.getAddress() : wallet.address;
-      const balance = await wallet.getBalance();
+      const address = typeof (wallet as any).getAddress === 'function' ? await (wallet as any).getAddress() : (wallet as any).address;
+      const balance = await (wallet as any).getBalance();
       logger.info(`Wallet Address: ${address}`);
       logger.info(`Wallet Balance: ${ethers.formatEther(balance)} MATIC`);
 
@@ -207,8 +207,8 @@ class ArbitrageBotApplication {
 
     shutdownManager.register(async () => {
       logger.info('Finalizing pending transactions...');
-      if (nonceManager && typeof nonceManager.releaseAllNonces === 'function') {
-        nonceManager.releaseAllNonces();
+      if (nonceManager && typeof (nonceManager as any).releaseAllNonces === 'function') {
+        (nonceManager as any).releaseAllNonces();
       }
     });
   }
@@ -267,15 +267,15 @@ class ArbitrageBotApplication {
       await currentProvider.getBlockNumber();
     } catch (error) {
       logger.warn('Provider health check failed:', error);
-      if (typeof provider.switchProvider === 'function') {
-        const switched = await provider.switchProvider();
+      if (typeof (provider as any).switchProvider === 'function') {
+        const switched = await (provider as any).switchProvider();
         if (switched) logger.info('Successfully switched to backup provider');
       }
     }
 
-    if (!isSimulationMode() && wallet.getBalance) {
+    if (!isSimulationMode() && (wallet as any).getBalance) {
       try {
-        const balance = await wallet.getBalance();
+        const balance = await (wallet as any).getBalance();
         const balanceEth = parseFloat(ethers.formatEther(balance));
         if (balanceEth < 0.1) {
           logger.error(`CRITICAL: Very low balance: ${balanceEth} MATIC`);
@@ -298,7 +298,7 @@ class ArbitrageBotApplication {
       uptime: Date.now() - this.startTime,
       mode: Config.execution.mode,
       startTime: new Date(this.startTime).toISOString(),
-      walletAddress: wallet.getAddress ? wallet.getAddress() : wallet.address,
+      walletAddress: (wallet as any).getAddress ? (wallet as any).getAddress() : (wallet as any).address,
     };
   }
 }

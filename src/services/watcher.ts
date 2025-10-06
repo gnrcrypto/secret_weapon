@@ -2,7 +2,8 @@ import { Config } from '../config';
 import { getPathfinder } from '../arb/pathfinder';
 import { getSimulator } from '../arb/simulator';
 import { getStrategy } from '../arb/strategy';
-import { RiskManager } from '../risk/riskManager';
+import { getExecutor } from '../exec/executor';
+import { getRiskManager } from '../risk/riskManager';
 import { provider, getWebSocketProvider } from '../providers/polygonProvider';
 import { toWei, fromWei } from '../utils/math';
 import winston from 'winston';
@@ -15,7 +16,9 @@ const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: { service: 'market-watcher' },
   transports: [
-    new winston.transports.Console({ format: winston.format.simple() }),
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
   ],
 });
 
@@ -57,7 +60,9 @@ export class MarketWatcher extends EventEmitter {
   }
 
   private setupEventListeners(): void {
-    const riskManager = new RiskManager();
+    const riskManager = getRiskManager();
+
+    // RiskManager implements EventEmitter so .on is available
     riskManager.on('circuit-breaker-triggered', (reason: string) => {
       logger.error(`Circuit breaker triggered: ${reason}`);
       this.pause();
@@ -229,8 +234,8 @@ export class MarketWatcher extends EventEmitter {
       return { executed: 0, totalProfit: 0 };
     }
 
-    const executor = getStrategy();
-    const riskManager = new RiskManager();
+    const executor = getExecutor();
+    const riskManager = getRiskManager();
     const strategy = getStrategy();
 
     let executed = 0;
@@ -241,7 +246,7 @@ export class MarketWatcher extends EventEmitter {
         const riskCheck = await riskManager.checkRisk(opportunity);
 
         if (!riskCheck.allowed) {
-          logger.warn(`Risk check failed: ${riskCheck.reasons.join(', ')}`);
+          logger.warn(`Risk check failed: ${riskCheck.reasons ? (riskCheck.reasons as string[]).join(', ') : 'unknown'}`);
           continue;
         }
 
@@ -272,7 +277,7 @@ export class MarketWatcher extends EventEmitter {
 
       } catch (error) {
         logger.error(`Error executing opportunity:`, error);
-        strategy.unregisterTrade(opportunity.simulation.path.id);
+        try { strategy.unregisterTrade(opportunity.simulation.path.id); } catch {}
       }
     }
 
@@ -319,7 +324,9 @@ export class MarketWatcher extends EventEmitter {
 
     if (this.wsProvider) {
       this.wsProvider.removeAllListeners();
-      await this.wsProvider.destroy();
+      if (typeof this.wsProvider.destroy === 'function') {
+        await this.wsProvider.destroy();
+      }
       this.wsProvider = null;
     }
 
@@ -358,7 +365,8 @@ export class MarketWatcher extends EventEmitter {
     this.blockQueue.start();
 
     if (this.wsProvider) {
-      this.startWebSocketWatcher();
+      // reattach listeners
+      this.startWebSocketWatcher().catch(() => {});
     } else {
       this.startPollingWatcher();
     }
@@ -396,4 +404,22 @@ export class MarketWatcher extends EventEmitter {
       memoryUsageMB: (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2),
     };
   }
+}
+
+/**
+ * Factory helper used by other modules that expect a createWatcher function.
+ * Returns an object exposing start/stop (wrapping the MarketWatcher instance).
+ */
+export function createWatcher(dataSource: DataSource) {
+  const watcher = new MarketWatcher(dataSource);
+
+  return {
+    start: () => watcher.start(),
+    stop: () => watcher.stop(),
+    on: (event: string, handler: (...args: any[]) => void) => watcher.on(event, handler),
+    pause: () => watcher.pause(),
+    resume: () => watcher.resume(),
+    getStatus: () => watcher.getStatus(),
+    getPerformanceMetrics: () => watcher.getPerformanceMetrics(),
+  };
 }
