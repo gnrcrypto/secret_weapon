@@ -21,6 +21,8 @@ declare const rawConfig: {
         gasMultiplier: number;
         maxPriorityFeeGwei: number;
         baseFeeMultiplier: number;
+        defaultGasLimit: number;
+        profitThresholdMultiplier: number;
     };
     execution: {
         mode: "simulate" | "live";
@@ -29,6 +31,7 @@ declare const rawConfig: {
         maxTradeSizeUsd: number;
         tradeCapPerTx: number;
         maxPositionSizeUsd: number;
+        txDeadlineSeconds: number;
     };
     flashloan: {
         enabled: boolean;
@@ -52,6 +55,7 @@ declare const rawConfig: {
         prometheusPort: number;
         healthCheckPort: number;
         logLevel: "debug" | "info" | "warn" | "error";
+        opportunityScanInterval: number;
     };
     alerts: {
         slackWebhookUrl: string | undefined;
@@ -63,6 +67,13 @@ declare const rawConfig: {
         maxConsecutiveFailures: number;
         circuitBreakerCooldownMs: number;
         maxGasPerBlock: number;
+        maxExposurePerTrade: number;
+        maxDailyExposure: number;
+        maxSingleTokenExposure: {};
+        maxDailyTrades: number;
+        maxPriceImpact: number;
+        maxSlippage: number;
+        minConfidence: number;
     };
     performance: {
         priceCacheTtlMs: number;
@@ -81,6 +92,9 @@ declare const rawConfig: {
         enableCrossDexArb: boolean;
         enableMevProtection: boolean;
         enableSandwichProtection: boolean;
+    };
+    workers: {
+        poolSize: number;
     };
 };
 export declare const Config: typeof rawConfig;

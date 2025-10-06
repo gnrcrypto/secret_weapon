@@ -12,9 +12,7 @@ const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: { service: 'ledger' },
   transports: [
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    }),
+    new winston.transports.Console({ format: winston.format.simple() }),
   ],
 });
 
@@ -24,7 +22,7 @@ export class Ledger {
   private tokenRepo: Repository<TokenEntity>;
   private dexRepo: Repository<DexEntity>;
 
-  constructor(private dataSource: DataSource) {
+  constructor(dataSource: DataSource) {
     this.tradeRepo = dataSource.getRepository(TradeEntity);
     this.walletRepo = dataSource.getRepository(WalletEntity);
     this.tokenRepo = dataSource.getRepository(TokenEntity);
@@ -61,7 +59,6 @@ export class Ledger {
 
     const savedTrade = await this.tradeRepo.save(trade);
 
-    // Update related stats
     await this.updateWalletStats(walletAddress, trade);
     await this.updateTokenStats(simulation.path.tokens[0].address, trade);
     await this.updateDexStats(simulation.path.dexes[0], trade);

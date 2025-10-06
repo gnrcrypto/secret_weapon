@@ -8,7 +8,6 @@ const dotenv_1 = require("dotenv");
 const joi_1 = __importDefault(require("joi"));
 // Load environment variables
 (0, dotenv_1.config)();
-// Configuration schema for validation
 const configSchema = joi_1.default.object({
     network: joi_1.default.object({
         rpcUrl: joi_1.default.string().uri().required(),
@@ -32,6 +31,8 @@ const configSchema = joi_1.default.object({
         gasMultiplier: joi_1.default.number().min(1).max(2).default(1.2),
         maxPriorityFeeGwei: joi_1.default.number().min(0).default(30),
         baseFeeMultiplier: joi_1.default.number().min(1).max(3).default(2),
+        defaultGasLimit: joi_1.default.number().min(100000).default(6000000),
+        profitThresholdMultiplier: joi_1.default.number().min(1).default(2),
     }),
     execution: joi_1.default.object({
         mode: joi_1.default.string().valid('simulate', 'live').default('simulate'),
@@ -40,6 +41,7 @@ const configSchema = joi_1.default.object({
         maxTradeSizeUsd: joi_1.default.number().min(0).default(10000),
         tradeCapPerTx: joi_1.default.number().min(0).default(5000),
         maxPositionSizeUsd: joi_1.default.number().min(0).default(50000),
+        txDeadlineSeconds: joi_1.default.number().min(60).default(1200),
     }),
     flashloan: joi_1.default.object({
         enabled: joi_1.default.boolean().default(true),
@@ -63,6 +65,7 @@ const configSchema = joi_1.default.object({
         prometheusPort: joi_1.default.number().default(9090),
         healthCheckPort: joi_1.default.number().default(3000),
         logLevel: joi_1.default.string().valid('debug', 'info', 'warn', 'error').default('info'),
+        opportunityScanInterval: joi_1.default.number().min(1000).default(30000),
     }),
     alerts: joi_1.default.object({
         slackWebhookUrl: joi_1.default.string().uri().optional(),
@@ -74,6 +77,13 @@ const configSchema = joi_1.default.object({
         maxConsecutiveFailures: joi_1.default.number().min(1).default(5),
         circuitBreakerCooldownMs: joi_1.default.number().min(0).default(60000),
         maxGasPerBlock: joi_1.default.number().min(0).default(30000000),
+        maxExposurePerTrade: joi_1.default.number().min(0).default(25000),
+        maxDailyExposure: joi_1.default.number().min(0).default(100000),
+        maxSingleTokenExposure: joi_1.default.object().pattern(joi_1.default.string(), joi_1.default.number().min(0)).default({}),
+        maxDailyTrades: joi_1.default.number().min(1).default(100),
+        maxPriceImpact: joi_1.default.number().min(0).max(100).default(5),
+        maxSlippage: joi_1.default.number().min(0).max(100).default(1),
+        minConfidence: joi_1.default.number().min(0).max(1).default(0.8),
     }),
     performance: joi_1.default.object({
         priceCacheTtlMs: joi_1.default.number().min(0).default(500),
@@ -92,6 +102,9 @@ const configSchema = joi_1.default.object({
         enableCrossDexArb: joi_1.default.boolean().default(true),
         enableMevProtection: joi_1.default.boolean().default(true),
         enableSandwichProtection: joi_1.default.boolean().default(true),
+    }),
+    workers: joi_1.default.object({
+        poolSize: joi_1.default.number().min(1).max(20).default(4),
     }),
 });
 // Parse environment variables into config object
@@ -118,6 +131,8 @@ const rawConfig = {
         gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || '1.2'),
         maxPriorityFeeGwei: parseFloat(process.env.MAX_PRIORITY_FEE_GWEI || '50'),
         baseFeeMultiplier: parseFloat(process.env.BASE_FEE_MULTIPLIER || '2'),
+        defaultGasLimit: parseInt(process.env.DEFAULT_GAS_LIMIT || '6000000'),
+        profitThresholdMultiplier: parseInt(process.env.PROFIT_THRESHOLD_MULTIPLIER || '2'),
     },
     execution: {
         mode: process.env.EXECUTOR_MODE,
@@ -126,6 +141,7 @@ const rawConfig = {
         maxTradeSizeUsd: parseFloat(process.env.MAX_TRADE_SIZE_USD || '10000'),
         tradeCapPerTx: parseFloat(process.env.TRADE_CAP_PER_TX || '5000'),
         maxPositionSizeUsd: parseFloat(process.env.MAX_POSITION_SIZE_USD || '50000'),
+        txDeadlineSeconds: parseInt(process.env.TX_DEADLINE_SECONDS || '1200'),
     },
     flashloan: {
         enabled: process.env.ENABLE_FLASHLOANS === 'true',
@@ -149,6 +165,7 @@ const rawConfig = {
         prometheusPort: parseInt(process.env.PROMETHEUS_PORT || '9090'),
         healthCheckPort: parseInt(process.env.HEALTH_CHECK_PORT || '3000'),
         logLevel: process.env.LOG_LEVEL,
+        opportunityScanInterval: parseInt(process.env.OPPORTUNITY_SCAN_INTERVAL || '30000'),
     },
     alerts: {
         slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
@@ -160,6 +177,13 @@ const rawConfig = {
         maxConsecutiveFailures: parseInt(process.env.MAX_CONSECUTIVE_FAILURES || '5'),
         circuitBreakerCooldownMs: parseInt(process.env.CIRCUIT_BREAKER_COOLDOWN_MS || '60000'),
         maxGasPerBlock: parseInt(process.env.MAX_GAS_PER_BLOCK || '30000000'),
+        maxExposurePerTrade: parseInt(process.env.MAX_EXPOSURE_PER_TRADE || '25000'),
+        maxDailyExposure: parseInt(process.env.MAX_DAILY_EXPOSURE || '100000'),
+        maxSingleTokenExposure: {},
+        maxDailyTrades: parseInt(process.env.MAX_DAILY_TRADES || '100'),
+        maxPriceImpact: parseInt(process.env.MAX_PRICE_IMPACT || '5'),
+        maxSlippage: parseInt(process.env.MAX_SLIPPAGE || '1'),
+        minConfidence: parseFloat(process.env.MIN_CONFIDENCE || '0.8'),
     },
     performance: {
         priceCacheTtlMs: parseInt(process.env.PRICE_CACHE_TTL_MS || '500'),
@@ -179,6 +203,9 @@ const rawConfig = {
         enableMevProtection: process.env.ENABLE_MEV_PROTECTION === 'true',
         enableSandwichProtection: process.env.ENABLE_SANDWICH_PROTECTION === 'true',
     },
+    workers: {
+        poolSize: parseInt(process.env.WORKER_POOL_SIZE || '4'),
+    },
 };
 // Validate configuration
 const { error, value: validatedConfig } = configSchema.validate(rawConfig, {
@@ -192,7 +219,6 @@ if (error) {
     });
     process.exit(1);
 }
-// Export validated configuration
 exports.Config = validatedConfig;
 exports.ADDRESSES = {
     WMATIC: '0x0d500B1d8E8eF31E21C99d1DbD9735AFf958023239c6A063',
@@ -209,31 +235,26 @@ exports.ADDRESSES = {
         UNISWAPV3: validatedConfig.dex.uniswapV3Router,
     },
 };
-// Export network constants
 exports.NETWORK = {
     POLYGON_CHAIN_ID: 137,
-    BLOCK_TIME: 2000, // ~2 seconds
+    BLOCK_TIME: 2000,
     MAX_BLOCK_RANGE: 2048,
     CONFIRMATION_BLOCKS: 3,
 };
-// Utility function to check if in simulation mode
 const isSimulationMode = () => {
     return exports.Config.execution.mode === 'simulate';
 };
 exports.isSimulationMode = isSimulationMode;
-// Utility function to check if in production
 const isProduction = () => {
     return process.env.NODE_ENV === 'production' && exports.Config.execution.mode === 'live';
 };
 exports.isProduction = isProduction;
-// Export config validator for runtime updates
 const validatePartialConfig = (partialConfig) => {
     const mergedConfig = { ...exports.Config, ...partialConfig };
     const { error } = configSchema.validate(mergedConfig);
     return !error;
 };
 exports.validatePartialConfig = validatePartialConfig;
-// Log sanitized config on startup (remove sensitive data)
 const logConfig = () => {
     const sanitized = JSON.parse(JSON.stringify(exports.Config));
     // Remove sensitive fields

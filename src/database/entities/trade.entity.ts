@@ -8,9 +8,8 @@ export class TradeEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Path information
   @Column({ type: 'varchar', length: 20 })
-  pathType!: 'triangular' | 'cross-dex' | 'flash-arb'; // Added 'flash-arb'
+  pathType!: 'triangular' | 'cross-dex' | 'flash-arb';
 
   @Column({ type: 'simple-array' })
   tokens!: string[];
@@ -39,7 +38,6 @@ export class TradeEntity {
   @Column({ type: 'boolean', default: false })
   isSuccessful!: boolean;
 
-  // Transaction details
   @Column({ type: 'varchar', length: 66, nullable: true })
   transactionHash!: string;
 

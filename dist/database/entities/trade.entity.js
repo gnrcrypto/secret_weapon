@@ -13,8 +13,7 @@ exports.TradeEntity = void 0;
 const typeorm_1 = require("typeorm");
 let TradeEntity = class TradeEntity {
     id;
-    // Path information
-    pathType; // Added 'flash-arb'
+    pathType;
     tokens;
     dexes;
     inputAmount;
@@ -24,7 +23,6 @@ let TradeEntity = class TradeEntity {
     slippage;
     confidence;
     isSuccessful;
-    // Transaction details
     transactionHash;
     blockNumber;
     gasUsed;

@@ -4,7 +4,6 @@ import Joi from 'joi';
 // Load environment variables
 dotenvConfig();
 
-// Configuration schema for validation
 const configSchema = Joi.object({
   network: Joi.object({
     rpcUrl: Joi.string().uri().required(),
@@ -12,27 +11,25 @@ const configSchema = Joi.object({
     chainId: Joi.number().required(),
     blockPollingInterval: Joi.number().min(50).default(100),
   }),
-  
   wallet: Joi.object({
     privateKey: Joi.string().pattern(/^0x[a-fA-F0-9]{64}$/).optional(),
     mnemonic: Joi.string().optional(),
     address: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).optional(),
   }).or('privateKey', 'mnemonic'),
-  
   providers: Joi.object({
     infuraKey: Joi.string().optional(),
     alchemyKey: Joi.string().optional(),
     quicknodeEndpoint: Joi.string().optional(),
   }),
-  
   gas: Joi.object({
     strategy: Joi.string().valid('conservative', 'standard', 'aggressive').default('standard'),
     maxGasGwei: Joi.number().min(1).max(1000).required(),
     gasMultiplier: Joi.number().min(1).max(2).default(1.2),
     maxPriorityFeeGwei: Joi.number().min(0).default(30),
     baseFeeMultiplier: Joi.number().min(1).max(3).default(2),
+    defaultGasLimit: Joi.number().min(100000).default(6000000),
+    profitThresholdMultiplier: Joi.number().min(1).default(2),
   }),
-  
   execution: Joi.object({
     mode: Joi.string().valid('simulate', 'live').default('simulate'),
     slippageBps: Joi.number().min(0).max(1000).default(50),
@@ -40,67 +37,70 @@ const configSchema = Joi.object({
     maxTradeSizeUsd: Joi.number().min(0).default(10000),
     tradeCapPerTx: Joi.number().min(0).default(5000),
     maxPositionSizeUsd: Joi.number().min(0).default(50000),
+    txDeadlineSeconds: Joi.number().min(60).default(1200),
   }),
-  
   flashloan: Joi.object({
     enabled: Joi.boolean().default(true),
     provider: Joi.string().valid('aave', 'balancer', 'dodo').default('aave'),
     maxFlashloanUsd: Joi.number().min(0).default(100000),
     flashloanFeeBps: Joi.number().min(0).max(100).default(9),
   }),
-  
   dex: Joi.object({
     enabledDexes: Joi.array().items(Joi.string()).min(1).required(),
     quickswapRouter: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
     sushiswapRouter: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
     uniswapV3Router: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).optional(),
   }),
-  
   database: Joi.object({
     accountingDbUrl: Joi.string().required(),
     redisUrl: Joi.string().default('redis://localhost:6379'),
     poolSize: Joi.number().min(5).max(100).default(20),
   }),
-  
   monitoring: Joi.object({
     sentryDsn: Joi.string().optional(),
     prometheusPort: Joi.number().default(9090),
     healthCheckPort: Joi.number().default(3000),
     logLevel: Joi.string().valid('debug', 'info', 'warn', 'error').default('info'),
+    opportunityScanInterval: Joi.number().min(1000).default(30000),
   }),
-  
   alerts: Joi.object({
     slackWebhookUrl: Joi.string().uri().optional(),
     minProfitAlertUsd: Joi.number().min(0).default(100),
     maxLossAlertUsd: Joi.number().min(0).default(50),
   }),
-  
   risk: Joi.object({
     dailyLossLimitUsd: Joi.number().min(0).default(500),
     maxConsecutiveFailures: Joi.number().min(1).default(5),
     circuitBreakerCooldownMs: Joi.number().min(0).default(60000),
     maxGasPerBlock: Joi.number().min(0).default(30000000),
+    maxExposurePerTrade: Joi.number().min(0).default(25000),
+    maxDailyExposure: Joi.number().min(0).default(100000),
+    maxSingleTokenExposure: Joi.object().pattern(Joi.string(), Joi.number().min(0)).default({}),
+    maxDailyTrades: Joi.number().min(1).default(100),
+    maxPriceImpact: Joi.number().min(0).max(100).default(5),
+    maxSlippage: Joi.number().min(0).max(100).default(1),
+    minConfidence: Joi.number().min(0).max(1).default(0.8),
   }),
-  
   performance: Joi.object({
     priceCacheTtlMs: Joi.number().min(0).default(500),
     pathCacheTtlMs: Joi.number().min(0).default(5000),
     maxConcurrentSimulations: Joi.number().min(1).max(50).default(10),
     workerPoolSize: Joi.number().min(1).max(20).default(4),
   }),
-  
   security: Joi.object({
     apiKeyHeader: Joi.string().default('X-API-KEY'),
     apiKey: Joi.string().min(32).required(),
     enableReplayProtection: Joi.boolean().default(true),
     nonceManagerType: Joi.string().valid('redis', 'memory', 'db').default('redis'),
   }),
-  
   features: Joi.object({
     enableTriangularArb: Joi.boolean().default(true),
     enableCrossDexArb: Joi.boolean().default(true),
     enableMevProtection: Joi.boolean().default(true),
     enableSandwichProtection: Joi.boolean().default(true),
+  }),
+  workers: Joi.object({
+    poolSize: Joi.number().min(1).max(20).default(4),
   }),
 });
 
@@ -112,27 +112,25 @@ const rawConfig = {
     chainId: parseInt(process.env.CHAIN_ID || '137'),
     blockPollingInterval: parseInt(process.env.BLOCK_POLLING_INTERVAL_MS || '100'),
   },
-  
   wallet: {
     privateKey: process.env.PRIVATE_KEY_PLACEHOLDER,
     mnemonic: process.env.MNEMONIC_PLACEHOLDER,
     address: process.env.HOT_WALLET_ADDRESS,
   },
-  
   providers: {
     infuraKey: process.env.INFURA_KEY,
     alchemyKey: process.env.ALCHEMY_KEY,
     quicknodeEndpoint: process.env.QUICKNODE_ENDPOINT,
   },
-  
   gas: {
     strategy: process.env.GAS_PRICE_STRATEGY as 'conservative' | 'standard' | 'aggressive',
     maxGasGwei: parseFloat(process.env.MAX_GAS_GWEI || '500'),
     gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || '1.2'),
     maxPriorityFeeGwei: parseFloat(process.env.MAX_PRIORITY_FEE_GWEI || '50'),
     baseFeeMultiplier: parseFloat(process.env.BASE_FEE_MULTIPLIER || '2'),
+    defaultGasLimit: parseInt(process.env.DEFAULT_GAS_LIMIT || '6000000'),
+    profitThresholdMultiplier: parseInt(process.env.PROFIT_THRESHOLD_MULTIPLIER || '2'),
   },
-  
   execution: {
     mode: process.env.EXECUTOR_MODE as 'simulate' | 'live',
     slippageBps: parseInt(process.env.SLIPPAGE_BPS || '50'),
@@ -140,67 +138,70 @@ const rawConfig = {
     maxTradeSizeUsd: parseFloat(process.env.MAX_TRADE_SIZE_USD || '10000'),
     tradeCapPerTx: parseFloat(process.env.TRADE_CAP_PER_TX || '5000'),
     maxPositionSizeUsd: parseFloat(process.env.MAX_POSITION_SIZE_USD || '50000'),
+    txDeadlineSeconds: parseInt(process.env.TX_DEADLINE_SECONDS || '1200'),
   },
-  
   flashloan: {
     enabled: process.env.ENABLE_FLASHLOANS === 'true',
     provider: process.env.FLASHLOAN_PROVIDER as 'aave' | 'balancer' | 'dodo',
     maxFlashloanUsd: parseFloat(process.env.MAX_FLASHLOAN_USD || '100000'),
     flashloanFeeBps: parseFloat(process.env.FLASHLOAN_FEE_BPS || '9'),
   },
-  
   dex: {
     enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap'],
     quickswapRouter: process.env.QUICKSWAP_ROUTER!,
     sushiswapRouter: process.env.SUSHISWAP_ROUTER!,
     uniswapV3Router: process.env.UNISWAPV3_ROUTER,
   },
-  
   database: {
     accountingDbUrl: process.env.ACCOUNTING_DB_URL!,
     redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
     poolSize: parseInt(process.env.DB_POOL_SIZE || '20'),
   },
-  
   monitoring: {
     sentryDsn: process.env.SENTRY_DSN,
     prometheusPort: parseInt(process.env.PROMETHEUS_PORT || '9090'),
     healthCheckPort: parseInt(process.env.HEALTH_CHECK_PORT || '3000'),
     logLevel: process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error',
+    opportunityScanInterval: parseInt(process.env.OPPORTUNITY_SCAN_INTERVAL || '30000'),
   },
-  
   alerts: {
     slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
     minProfitAlertUsd: parseFloat(process.env.ALERT_MIN_PROFIT_USD || '100'),
     maxLossAlertUsd: parseFloat(process.env.ALERT_MAX_LOSS_USD || '50'),
   },
-  
   risk: {
     dailyLossLimitUsd: parseFloat(process.env.DAILY_LOSS_LIMIT_USD || '500'),
     maxConsecutiveFailures: parseInt(process.env.MAX_CONSECUTIVE_FAILURES || '5'),
     circuitBreakerCooldownMs: parseInt(process.env.CIRCUIT_BREAKER_COOLDOWN_MS || '60000'),
     maxGasPerBlock: parseInt(process.env.MAX_GAS_PER_BLOCK || '30000000'),
+    maxExposurePerTrade: parseInt(process.env.MAX_EXPOSURE_PER_TRADE || '25000'),
+    maxDailyExposure: parseInt(process.env.MAX_DAILY_EXPOSURE || '100000'),
+    maxSingleTokenExposure: {},
+    maxDailyTrades: parseInt(process.env.MAX_DAILY_TRADES || '100'),
+    maxPriceImpact: parseInt(process.env.MAX_PRICE_IMPACT || '5'),
+    maxSlippage: parseInt(process.env.MAX_SLIPPAGE || '1'),
+    minConfidence: parseFloat(process.env.MIN_CONFIDENCE || '0.8'),
   },
-  
   performance: {
     priceCacheTtlMs: parseInt(process.env.PRICE_CACHE_TTL_MS || '500'),
     pathCacheTtlMs: parseInt(process.env.PATH_CACHE_TTL_MS || '5000'),
     maxConcurrentSimulations: parseInt(process.env.MAX_CONCURRENT_SIMULATIONS || '10'),
     workerPoolSize: parseInt(process.env.WORKER_POOL_SIZE || '4'),
   },
-  
   security: {
     apiKeyHeader: process.env.API_KEY_HEADER || 'X-API-KEY',
     apiKey: process.env.API_KEY!,
     enableReplayProtection: process.env.ENABLE_REPLAY_PROTECTION === 'true',
     nonceManagerType: process.env.NONCE_MANAGER_TYPE as 'redis' | 'memory' | 'db',
   },
-  
   features: {
     enableTriangularArb: process.env.ENABLE_TRIANGULAR_ARB === 'true',
     enableCrossDexArb: process.env.ENABLE_CROSS_DEX_ARB === 'true',
     enableMevProtection: process.env.ENABLE_MEV_PROTECTION === 'true',
     enableSandwichProtection: process.env.ENABLE_SANDWICH_PROTECTION === 'true',
+  },
+  workers: {
+    poolSize: parseInt(process.env.WORKER_POOL_SIZE || '4'),
   },
 };
 
@@ -218,7 +219,6 @@ if (error) {
   process.exit(1);
 }
 
-// Export validated configuration
 export const Config = validatedConfig as typeof rawConfig;
 
 export const ADDRESSES = {
@@ -237,48 +237,40 @@ export const ADDRESSES = {
   },
 } as const;
 
-// Export network constants
 export const NETWORK = {
   POLYGON_CHAIN_ID: 137,
-  BLOCK_TIME: 2000, // ~2 seconds
+  BLOCK_TIME: 2000,
   MAX_BLOCK_RANGE: 2048,
   CONFIRMATION_BLOCKS: 3,
 } as const;
 
-// Utility function to check if in simulation mode
 export const isSimulationMode = (): boolean => {
   return Config.execution.mode === 'simulate';
 };
 
-// Utility function to check if in production
 export const isProduction = (): boolean => {
   return process.env.NODE_ENV === 'production' && Config.execution.mode === 'live';
 };
 
-// Export config validator for runtime updates
 export const validatePartialConfig = (partialConfig: Partial<typeof rawConfig>): boolean => {
   const mergedConfig = { ...Config, ...partialConfig };
   const { error } = configSchema.validate(mergedConfig);
   return !error;
 };
 
-// Log sanitized config on startup (remove sensitive data)
 export const logConfig = (): void => {
   const sanitized = JSON.parse(JSON.stringify(Config));
-  
+
   // Remove sensitive fields
   if (sanitized.wallet.privateKey) sanitized.wallet.privateKey = '***HIDDEN***';
   if (sanitized.wallet.mnemonic) sanitized.wallet.mnemonic = '***HIDDEN***';
   if (sanitized.providers.infuraKey) sanitized.providers.infuraKey = '***HIDDEN***';
   if (sanitized.providers.alchemyKey) sanitized.providers.alchemyKey = '***HIDDEN***';
   if (sanitized.database.accountingDbUrl) {
-    sanitized.database.accountingDbUrl = sanitized.database.accountingDbUrl.replace(
-      /:\/\/[^@]+@/,
-      '://***:***@'
-    );
+    sanitized.database.accountingDbUrl = sanitized.database.accountingDbUrl.replace(/:\/\/[^@]+@/, '://***:***@');
   }
   if (sanitized.security.apiKey) sanitized.security.apiKey = '***HIDDEN***';
   if (sanitized.alerts.slackWebhookUrl) sanitized.alerts.slackWebhookUrl = '***HIDDEN***';
-  
+
   console.log('Configuration loaded:', JSON.stringify(sanitized, null, 2));
 };

@@ -6,7 +6,6 @@ import { DexEntity } from '../database/entities/dex.entity';
 import { SimulationResult } from '../arb/simulator';
 import { ExecutionResult } from '../exec/executor';
 export declare class Ledger {
-    private dataSource;
     private tradeRepo;
     private walletRepo;
     private tokenRepo;
