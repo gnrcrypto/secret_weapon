@@ -1,0 +1,163 @@
+import { DataSource, Repository } from 'typeorm';
+import { TradeEntity } from './entities/trade.entity';
+import { WalletEntity } from './entities/wallet.entity';
+import { TokenEntity } from './entities/token.entity';
+import { DexEntity } from './entities/dex.entity';
+import { SimulationResult } from '../arb/simulator';
+import { ArbitragePath } from '../arb/pathfinder';
+import { Config } from '../config';
+import winston from 'winston';
+
+export class Ledger {
+  private dataSource: DataSource;
+  private tradeRepo: Repository<TradeEntity>;
+  private walletRepo: Repository<WalletEntity>;
+  private tokenRepo: Repository<TokenEntity>;
+  private dexRepo: Repository<DexEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
+    this.tradeRepo = dataSource.getRepository(TradeEntity);
+    this.walletRepo = dataSource.getRepository(WalletEntity);
+    this.tokenRepo = dataSource.getRepository(TokenEntity);
+    this.dexRepo = dataSource.getRepository(DexEntity);
+  }
+
+  /**
+   * Record a completed trade
+   */
+  async recordTrade(
+    simulationResult: SimulationResult, 
+    path: ArbitragePath, 
+    transactionHash?: string,
+    errorMessage?: string
+  ): Promise<void> {
+    try {
+      // Create trade record
+      const trade = this.tradeRepo.create({
+        pathType: path.type,
+        tokens: path.tokens.map(t => t.address),
+        dexes: path.dexes,
+        inputAmount: simulationResult.inputAmount.toString(),
+        outputAmount: simulationResult.outputAmount.toString(),
+        netProfitUsd: simulationResult.netProfitUsd,
+        priceImpact: simulationResult.priceImpact,
+        slippage: simulationResult.slippage,
+        confidence: simulationResult.confidence,
+        isSuccessful: simulationResult.isP  isProfitable,
+        transactionHash,
+        errorMessage
+      });
+
+      await this.tradeRepo.save(trade);
+
+      // Update related entities
+      await this.updateWalletPerformance(trade);
+      await this.updateTokenPerformance(path.tokens, trade);
+      await this.updateDexPerformance(path.dexes, trade);
+    } catch (error) {
+      winston.error('Failed to record trade:', error);
+    }
+  }
+
+  /**
+   * Update wallet performance metrics
+   */
+  private async updateWalletPerformance(trade: TradeEntity): Promise<void> {
+    const wallet = await this.walletRepo.findOne({ 
+      where: { address: Config.wallet.address } 
+    }) || this.walletRepo.create({ 
+      address: Config.wallet.address 
+    });
+
+    wallet.totalTrades++;
+    wallet.totalProfitUsd += trade.netProfitUsd;
+    wallet.successfulTrades += trade.isSuccessful ? 1 : 0;
+
+    await this.walletRepo.save(wallet);
+  }
+
+  /**
+   * Update token-level performance metrics
+   */
+  private async updateTokenPerformance(
+    tokens: ArbitragePath['tokens'], 
+    trade: TradeEntity
+  ): Promise<void> {
+    for (const token of tokens) {
+      let tokenEntity = await this.tokenRepo.findOne({ 
+        where: { address: token.address } 
+      }) || this.tokenRepo.create({ 
+        address: token.address,
+        symbol: token.symbol,
+        name: token.name,
+        decimals: token.decimals
+      });
+
+      tokenEntity.totalTradeVolume += parseFloat(trade.inputAmount);
+      tokenEntity.totalProfitGenerated += trade.netProfitUsd;
+
+      await this.tokenRepo.save(tokenEntity);
+    }
+  }
+
+  /**
+   * Update DEX-level performance metrics
+   */
+  private async updateDexPerformance(
+    dexes: string[], 
+    trade: TradeEntity
+  ): Promise<void> {
+    for (const dexName of dexes) {
+      let dexEntity = await this.dexRepo.findOne({ 
+        where: { name: dexName } 
+      }) || this.dexRepo.create({ 
+        name: dexName,
+        protocol: 'uniswap-v2' // TODO: Make this dynamic
+      });
+
+      dexEntity.totalTradeVolume += parseFloat(trade.inputAmount);
+      dexEntity.totalProfitGenerated += trade.netProfitUsd;
+      dexEntity.totalTrades++;
+
+      await this.dexRepo.save(dexEntity);
+    }
+  }
+
+  /**
+   * Retrieve trade history
+   */
+  async getTradeHistory(
+    options: { 
+      limit?: number; 
+      offset?: number; 
+      startDate?: Date; 
+      endDate?: Date 
+    } = {}
+  ): Promise<TradeEntity[]> {
+    const { 
+      limit = 50, 
+      offset = 0, 
+      startDate, 
+      endDate 
+    } = options;
+
+    const queryBuilder = this.tradeRepo.createQueryBuilder('trade');
+
+    if (startDate) {
+      queryBuilder.andWhere('trade.createdAt >= :startDate', { startDate });
+    }
+
+    if (endDate) {
+      queryBuilder.andWhere('trade.createdAt <= :endDate', { endDate });
+    }
+
+    return queryBuilder
+      .orderBy('trade.createdAt', 'DESC')
+      .take(limit)
+      .skip(offset)
+      .getMany();
+  }
+}
+
+export const createLedger = (dataSource: DataSource) => new Ledger(dataSource);

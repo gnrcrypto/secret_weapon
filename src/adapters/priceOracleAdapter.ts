@@ -6,15 +6,10 @@ import {
   POLYGON_ADDRESSES,
   CHAINLINK_ORACLE_ABI
 } from '../utils/abi';
-import {
-  fromWei,
-  normalizeDecimals,
-  TOKEN_DECIMALS
-} from '../utils/math';
+import { fromWei } from '../utils/math';
 import winston from 'winston';
 import NodeCache from 'node-cache';
 
-// Logger setup
 const logger = winston.createLogger({
   level: Config.monitoring.logLevel,
   format: winston.format.json(),
@@ -26,22 +21,19 @@ const logger = winston.createLogger({
   ],
 });
 
-// Price cache with TTL
 const priceCache = new NodeCache({
-  stdTTL: Config.performance.priceCacheTtlMs / 1000, // Convert to seconds
+  stdTTL: Config.performance.priceCacheTtlMs / 1000,
   checkperiod: 60,
   useClones: false,
 });
 
-// Oracle configuration
 interface OracleConfig {
   address: string;
   decimals: number;
-  heartbeat: number; // Maximum staleness in seconds
+  heartbeat: number;
   description?: string;
 }
 
-// Price data
 export interface PriceData {
   price: number;
   timestamp: number;
@@ -49,24 +41,20 @@ export interface PriceData {
   confidence?: number;
 }
 
-// Token pair price
 export interface TokenPairPrice {
   tokenA: string;
   tokenB: string;
-  price: number; // Price of tokenA in terms of tokenB
-  inversePrice: number; // Price of tokenB in terms of tokenA
+  price: number;
+  inversePrice: number;
   timestamp: number;
   sources: string[];
 }
 
-/**
- * Chainlink oracle configurations for Polygon
- */
 const CHAINLINK_ORACLES: Record<string, OracleConfig> = {
   'MATIC/USD': {
     address: POLYGON_ADDRESSES.CHAINLINK_MATIC_USD,
     decimals: 8,
-    heartbeat: 120, // 2 minutes
+    heartbeat: 120,
     description: 'MATIC / USD',
   },
   'ETH/USD': {
@@ -84,26 +72,11 @@ const CHAINLINK_ORACLES: Record<string, OracleConfig> = {
   'USDC/USD': {
     address: POLYGON_ADDRESSES.CHAINLINK_USDC_USD,
     decimals: 8,
-    heartbeat: 3600, // 1 hour for stablecoins
+    heartbeat: 3600,
     description: 'USDC / USD',
-  },
-  'USDT/USD': {
-    address: '0x0A6513e40db6EB1b165753AD52E80663aeA50545',
-    decimals: 8,
-    heartbeat: 3600,
-    description: 'USDT / USD',
-  },
-  'DAI/USD': {
-    address: '0x4746DeC9e833A82EC7C2C1356372CcF2cfcD2F3D',
-    decimals: 8,
-    heartbeat: 3600,
-    description: 'DAI / USD',
   },
 };
 
-/**
- * Token symbol to address mapping
- */
 const TOKEN_ADDRESSES: Record<string, string> = {
   WMATIC: ADDRESSES.WMATIC,
   MATIC: ADDRESSES.WMATIC,
@@ -116,15 +89,10 @@ const TOKEN_ADDRESSES: Record<string, string> = {
   BTC: ADDRESSES.WBTC,
 };
 
-/**
- * Price Oracle Adapter
- */
 export class PriceOracleAdapter {
   private chainlinkContracts: Map<string, Contract> = new Map();
   
-  constructor(
-    private provider: JsonRpcProvider
-  ) {
+  constructor(private provider: JsonRpcProvider) {
     this.initializeOracles();
   }
   
@@ -140,9 +108,6 @@ export class PriceOracleAdapter {
     logger.info(`Initialized ${this.chainlinkContracts.size} Chainlink oracles`);
   }
   
-  /**
-   * Get price from Chainlink oracle
-   */
   async getChainlinkPrice(pair: string): Promise<PriceData | null> {
     const cacheKey = `chainlink:${pair}`;
     const cached = priceCache.get<PriceData>(cacheKey);
@@ -162,7 +127,6 @@ export class PriceOracleAdapter {
       const updatedAt = Number(roundData.updatedAt);
       const currentTime = Math.floor(Date.now() / 1000);
       
-      // Check staleness
       if (currentTime - updatedAt > config.heartbeat) {
         logger.warn(`Chainlink price for ${pair} is stale (${currentTime - updatedAt}s old)`);
       }
@@ -182,33 +146,22 @@ export class PriceOracleAdapter {
     }
   }
   
-  /**
-   * Get price from DEX pools
-   */
-  async getDexPrice(
-    tokenA: string,
-    tokenB: string
-  ): Promise<PriceData | null> {
+  async getDexPrice(tokenA: string, tokenB: string): Promise<PriceData | null> {
     const cacheKey = `dex:${tokenA}:${tokenB}`;
     const cached = priceCache.get<PriceData>(cacheKey);
     if (cached) return cached;
     
     try {
-      // Import MultiDexRouter to avoid circular dependency
       const { getMultiDexRouter } = await import('./dexRouterAdapter');
       const router = getMultiDexRouter();
       
-      // Get quote for 1 token
       const tokenAInfo = await router.getTokenInfo(tokenA);
       const oneToken = BigInt(10) ** BigInt(tokenAInfo.decimals);
       
       const quote = await router.getBestQuote(tokenA, tokenB, oneToken);
       
-      if (!quote) {
-        return null;
-      }
+      if (!quote) return null;
       
-      // Calculate price
       const tokenBInfo = await router.getTokenInfo(tokenB);
       const outputAmount = parseFloat(fromWei(quote.amountOut, tokenBInfo.decimals));
       
@@ -216,7 +169,7 @@ export class PriceOracleAdapter {
         price: outputAmount,
         timestamp: Date.now(),
         source: 'dex',
-        confidence: 0.8, // Lower confidence for DEX prices due to slippage
+        confidence: 0.8,
       };
       
       priceCache.set(cacheKey, priceData);
@@ -227,19 +180,13 @@ export class PriceOracleAdapter {
     }
   }
   
-  /**
-   * Get USD price for a token
-   */
   async getTokenPriceUSD(tokenSymbolOrAddress: string): Promise<number | null> {
-    // Normalize to address
     const tokenAddress = TOKEN_ADDRESSES[tokenSymbolOrAddress.toUpperCase()] || tokenSymbolOrAddress;
     
-    // Check if it's a stablecoin
     if (this.isStablecoin(tokenAddress)) {
-      return 1.0; // Assume $1 for stablecoins
+      return 1.0;
     }
     
-    // Try to get Chainlink price first
     const chainlinkPair = this.getChainlinkPair(tokenAddress);
     if (chainlinkPair) {
       const chainlinkPrice = await this.getChainlinkPrice(chainlinkPair);
@@ -248,7 +195,6 @@ export class PriceOracleAdapter {
       }
     }
     
-    // Fall back to DEX price against USDC
     const usdcAddress = ADDRESSES.USDC;
     const dexPrice = await this.getDexPrice(tokenAddress, usdcAddress);
     
@@ -256,7 +202,6 @@ export class PriceOracleAdapter {
       return dexPrice.price;
     }
     
-    // Try to derive price through WMATIC
     const maticPrice = await this.getChainlinkPrice('MATIC/USD');
     if (maticPrice) {
       const tokenToMatic = await this.getDexPrice(tokenAddress, ADDRESSES.WMATIC);
@@ -269,32 +214,23 @@ export class PriceOracleAdapter {
     return null;
   }
   
-  /**
-   * Get price between two tokens
-   */
-  async getPrice(
-    tokenA: string,
-    tokenB: string
-  ): Promise<TokenPairPrice | null> {
+  async getPrice(tokenA: string, tokenB: string): Promise<TokenPairPrice | null> {
     const cacheKey = `pair:${tokenA}:${tokenB}`;
     const cached = priceCache.get<TokenPairPrice>(cacheKey);
     if (cached) return cached;
     
-    // Normalize addresses
     const addressA = TOKEN_ADDRESSES[tokenA.toUpperCase()] || tokenA;
     const addressB = TOKEN_ADDRESSES[tokenB.toUpperCase()] || tokenB;
     
     const sources: string[] = [];
     let price: number | null = null;
     
-    // Try direct DEX price
     const dexPrice = await this.getDexPrice(addressA, addressB);
     if (dexPrice) {
       price = dexPrice.price;
       sources.push('dex');
     }
     
-    // Try to calculate through USD prices
     if (!price) {
       const [priceAUSD, priceBUSD] = await Promise.all([
         this.getTokenPriceUSD(addressA),
@@ -307,9 +243,7 @@ export class PriceOracleAdapter {
       }
     }
     
-    if (!price) {
-      return null;
-    }
+    if (!price) return null;
     
     const pairPrice: TokenPairPrice = {
       tokenA: addressA,
@@ -324,9 +258,6 @@ export class PriceOracleAdapter {
     return pairPrice;
   }
   
-  /**
-   * Get pool reserves (for price impact calculation)
-   */
   async getPoolReserves(
     poolAddress: string
   ): Promise<{ reserve0: bigint; reserve1: bigint; token0: string; token1: string } | null> {
@@ -355,9 +286,6 @@ export class PriceOracleAdapter {
     }
   }
   
-  /**
-   * Calculate price impact for a trade
-   */
   async calculatePriceImpact(
     tokenIn: string,
     tokenOut: string,
@@ -365,16 +293,14 @@ export class PriceOracleAdapter {
     dexName?: string
   ): Promise<number> {
     try {
-      // Import MultiDexRouter to avoid circular dependency
       const { getMultiDexRouter } = await import('./dexRouterAdapter');
       const router = getMultiDexRouter();
       
-      // Get the specific adapter or use best quote
       if (dexName) {
         const adapters = router.getAdapters();
         const adapter = adapters.get(dexName.toLowerCase());
         if (adapter) {
-          const reserves = await adapter.getReserves(tokenIn, tokenOut);
+          const reserves = await (adapter as any).getReserves(tokenIn, tokenOut);
           if (reserves) {
             const spotPrice = parseFloat(reserves.reserve1.toString()) / parseFloat(reserves.reserve0.toString());
             const amounts = await adapter.getAmountsOut([tokenIn, tokenOut], amountIn);
@@ -384,7 +310,6 @@ export class PriceOracleAdapter {
         }
       }
       
-      // Fallback to quote-based calculation
       const quote = await router.getBestQuote(tokenIn, tokenOut, amountIn);
       return quote?.priceImpact || 0;
     } catch (error) {
@@ -393,17 +318,10 @@ export class PriceOracleAdapter {
     }
   }
   
-  /**
-   * Get aggregated price from multiple sources
-   */
-  async getAggregatedPrice(
-    tokenA: string,
-    tokenB: string
-  ): Promise<PriceData> {
+  async getAggregatedPrice(tokenA: string, tokenB: string): Promise<PriceData> {
     const prices: number[] = [];
     const sources: string[] = [];
     
-    // Get Chainlink price if available
     const chainlinkPair = this.getChainlinkPairForTokens(tokenA, tokenB);
     if (chainlinkPair) {
       const chainlinkPrice = await this.getChainlinkPrice(chainlinkPair);
@@ -413,14 +331,12 @@ export class PriceOracleAdapter {
       }
     }
     
-    // Get DEX prices
     const dexPrice = await this.getDexPrice(tokenA, tokenB);
     if (dexPrice) {
       prices.push(dexPrice.price);
       sources.push('dex');
     }
     
-    // Calculate through USD if no direct prices
     if (prices.length === 0) {
       const [priceAUSD, priceBUSD] = await Promise.all([
         this.getTokenPriceUSD(tokenA),
@@ -437,7 +353,6 @@ export class PriceOracleAdapter {
       throw new Error(`No price sources available for ${tokenA}/${tokenB}`);
     }
     
-    // Calculate weighted average (giving more weight to Chainlink)
     let totalWeight = 0;
     let weightedSum = 0;
     
@@ -451,13 +366,10 @@ export class PriceOracleAdapter {
       price: weightedSum / totalWeight,
       timestamp: Date.now(),
       source: 'aggregated',
-      confidence: Math.min(1, prices.length / 2), // More sources = higher confidence
+      confidence: Math.min(1, prices.length / 2),
     };
   }
   
-  /**
-   * Validate price against multiple sources
-   */
   async validatePrice(
     tokenA: string,
     tokenB: string,
@@ -476,13 +388,10 @@ export class PriceOracleAdapter {
       return true;
     } catch (error) {
       logger.error('Price validation failed:', error);
-      return false; // Be conservative on validation failures
+      return false;
     }
   }
   
-  /**
-   * Helper to check if token is a stablecoin
-   */
   private isStablecoin(tokenAddress: string): boolean {
     const stablecoins = [
       ADDRESSES.USDC,
@@ -493,63 +402,26 @@ export class PriceOracleAdapter {
     return stablecoins.includes(tokenAddress.toLowerCase());
   }
   
-  /**
-   * Helper to get Chainlink pair for a token
-   */
   private getChainlinkPair(tokenAddress: string): string | null {
     const addressLower = tokenAddress.toLowerCase();
     
-    if (addressLower === ADDRESSES.WMATIC.toLowerCase()) {
-      return 'MATIC/USD';
-    }
-    if (addressLower === ADDRESSES.WETH.toLowerCase()) {
-      return 'ETH/USD';
-    }
-    if (addressLower === ADDRESSES.WBTC.toLowerCase()) {
-      return 'BTC/USD';
-    }
-    if (addressLower === ADDRESSES.USDC.toLowerCase()) {
-      return 'USDC/USD';
-    }
-    if (addressLower === ADDRESSES.USDT.toLowerCase()) {
-      return 'USDT/USD';
-    }
-    if (addressLower === ADDRESSES.DAI.toLowerCase()) {
-      return 'DAI/USD';
-    }
+    if (addressLower === ADDRESSES.WMATIC.toLowerCase()) return 'MATIC/USD';
+    if (addressLower === ADDRESSES.WETH.toLowerCase()) return 'ETH/USD';
+    if (addressLower === ADDRESSES.WBTC.toLowerCase()) return 'BTC/USD';
+    if (addressLower === ADDRESSES.USDC.toLowerCase()) return 'USDC/USD';
     
     return null;
   }
   
-  /**
-   * Helper to get Chainlink pair for token pair
-   */
-  private getChainlinkPairForTokens(tokenA: string, tokenB: string): string | null {
-    // Check if we have a direct oracle for this pair
-    // Currently, most Chainlink oracles are token/USD pairs
-    // Could be extended for cross pairs like ETH/BTC if available
-    
-    const tokenAUpper = tokenA.toUpperCase();
-    const tokenBUpper = tokenB.toUpperCase();
-    
-    if (tokenBUpper === 'USD') {
-      return this.getChainlinkPair(tokenA);
-    }
-    
-    return null;
+  private getChainlinkPairForTokens(tokenA: string, _tokenB: string): string | null {
+    return this.getChainlinkPair(tokenA);
   }
   
-  /**
-   * Clear price cache
-   */
   clearCache(): void {
     priceCache.flushAll();
     logger.info('Price cache cleared');
   }
   
-  /**
-   * Get cache statistics
-   */
   getCacheStats(): object {
     return {
       keys: priceCache.keys().length,
@@ -560,7 +432,6 @@ export class PriceOracleAdapter {
   }
 }
 
-// Export singleton instance
 let priceOracle: PriceOracleAdapter | null = null;
 
 export function getPriceOracle(): PriceOracleAdapter {
@@ -570,6 +441,3 @@ export function getPriceOracle(): PriceOracleAdapter {
   }
   return priceOracle;
 }
-
-// Export types and utilities
-export type { OracleConfig, PriceData, TokenPairPrice };

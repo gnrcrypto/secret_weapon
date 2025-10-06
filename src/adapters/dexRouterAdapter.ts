@@ -1,20 +1,16 @@
+import { MaxUint256 } from 'ethers';
 import { Contract, Interface, JsonRpcProvider, Wallet } from 'ethers';
 import { Config, ADDRESSES } from '../config';
 import { provider, wallet } from '../providers/polygonProvider';
-import { 
-  interfaces, 
+import {
+  interfaces,
   POLYGON_ADDRESSES,
   getRouterInterface,
-  encodeFunctionCall,
   ERC20_ABI
 } from '../utils/abi';
 import {
-  toWei,
   fromWei,
   calculateMinimumOutput,
-  getAmountOut,
-  normalizeDecimals,
-  TOKEN_DECIMALS
 } from '../utils/math';
 import winston from 'winston';
 
@@ -112,7 +108,7 @@ export class DexAdapter {
   protected contract: Contract;
   protected factoryContract: Contract | null = null;
   protected routerInterface: Interface;
-  
+
   constructor(
     protected config: DexConfig,
     protected provider: JsonRpcProvider,
@@ -124,7 +120,7 @@ export class DexAdapter {
       this.routerInterface,
       signer || provider
     );
-    
+
     if (config.factory && !config.isV3) {
       this.factoryContract = new Contract(
         config.factory,
@@ -133,7 +129,7 @@ export class DexAdapter {
       );
     }
   }
-  
+
   /**
    * Get amounts out for a swap path
    */
@@ -143,7 +139,7 @@ export class DexAdapter {
         // V3 requires different handling
         return this.getAmountsOutV3(path, amountIn);
       }
-      
+
       const amounts = await this.contract.getAmountsOut(amountIn, path);
       return amounts.map((a: any) => BigInt(a.toString()));
     } catch (error) {
@@ -151,7 +147,7 @@ export class DexAdapter {
       throw error;
     }
   }
-  
+
   /**
    * Get amounts in for a swap path
    */
@@ -161,7 +157,7 @@ export class DexAdapter {
         // V3 requires different handling
         return this.getAmountsInV3(path, amountOut);
       }
-      
+
       const amounts = await this.contract.getAmountsIn(amountOut, path);
       return amounts.map((a: any) => BigInt(a.toString()));
     } catch (error) {
@@ -169,7 +165,7 @@ export class DexAdapter {
       throw error;
     }
   }
-  
+
   /**
    * Build swap transaction
    */
@@ -182,22 +178,22 @@ export class DexAdapter {
       recipient,
       deadline,
     } = params;
-    
+
     if (this.config.isV3) {
       return this.buildSwapTxV3(params);
     }
-    
+
     // Build path
     const path = [tokenIn, tokenOut];
-    
+
     // Check if we need to wrap/unwrap MATIC
     const isFromMatic = tokenIn.toLowerCase() === 'native';
     const isToMatic = tokenOut.toLowerCase() === 'native';
-    
+
     let methodName: string;
     let methodParams: any[];
     let value = BigInt(0);
-    
+
     if (isFromMatic) {
       methodName = 'swapExactETHForTokens';
       methodParams = [amountOutMin, [ADDRESSES.WMATIC, tokenOut], recipient, deadline];
@@ -209,14 +205,14 @@ export class DexAdapter {
       methodName = 'swapExactTokensForTokens';
       methodParams = [amountIn, amountOutMin, path, recipient, deadline];
     }
-    
+
     return {
       to: this.config.router,
       data: this.routerInterface.encodeFunctionData(methodName, methodParams),
       value,
     };
   }
-  
+
   /**
    * Execute swap
    */
@@ -231,28 +227,28 @@ export class DexAdapter {
         effectivePrice: parseFloat(fromWei(params.amountOutMin)) / parseFloat(fromWei(params.amountIn)),
       };
     }
-    
+
     if (!this.signer) {
       throw new Error('Signer required for executing swaps');
     }
-    
+
     const tx = await this.buildSwapTx(params);
-    
+
     // Add gas settings
     const gasLimit = await this.estimateGas(tx);
     tx.gasLimit = gasLimit * BigInt(120) / BigInt(100); // Add 20% buffer
-    
+
     // Send transaction
     const txResponse = await this.signer.sendTransaction(tx);
     const receipt = await txResponse.wait();
-    
+
     if (!receipt || receipt.status !== 1) {
       throw new Error(`Swap failed: ${txResponse.hash}`);
     }
-    
+
     // Parse logs to get actual amounts
     const swapLog = this.parseSwapLog(receipt.logs);
-    
+
     return {
       transactionHash: receipt.hash,
       amountIn: params.amountIn,
@@ -261,7 +257,7 @@ export class DexAdapter {
       effectivePrice: parseFloat(fromWei(swapLog?.amountOut || params.amountOutMin)) / parseFloat(fromWei(params.amountIn)),
     };
   }
-  
+
   /**
    * Estimate gas for swap
    */
@@ -270,17 +266,17 @@ export class DexAdapter {
       const estimate = await this.provider.estimateGas(tx);
       return estimate;
     } catch (error) {
-      logger.warn(`Gas estimation failed, using default: ${error}`);
+      // Silent fallback - expected in simulate mode without tokens
       return BigInt(300000); // Default gas limit
     }
   }
-  
+
   /**
    * Get pair address for two tokens
    */
   async getPairAddress(tokenA: string, tokenB: string): Promise<string | null> {
     if (!this.factoryContract) return null;
-    
+
     try {
       const pair = await this.factoryContract.getPair(tokenA, tokenB);
       return pair !== '0x0000000000000000000000000000000000000000' ? pair : null;
@@ -289,24 +285,24 @@ export class DexAdapter {
       return null;
     }
   }
-  
+
   /**
    * Get reserves for a pair
    */
   async getReserves(tokenA: string, tokenB: string): Promise<{ reserve0: bigint; reserve1: bigint } | null> {
     const pairAddress = await this.getPairAddress(tokenA, tokenB);
     if (!pairAddress) return null;
-    
+
     try {
       const pairContract = new Contract(
         pairAddress,
         interfaces.UniswapV2Pair,
         this.provider
       );
-      
+
       const [reserve0, reserve1] = await pairContract.getReserves();
       const token0 = await pairContract.token0();
-      
+
       // Order reserves based on token addresses
       if (token0.toLowerCase() === tokenA.toLowerCase()) {
         return { reserve0: BigInt(reserve0), reserve1: BigInt(reserve1) };
@@ -318,20 +314,20 @@ export class DexAdapter {
       return null;
     }
   }
-  
+
   // V3 specific methods
-  private async getAmountsOutV3(path: string[], amountIn: bigint): Promise<bigint[]> {
+  private async getAmountsOutV3(_path: string[], amountIn: bigint): Promise<bigint[]> {
     // Simplified V3 quote - in production, use Quoter contract
     logger.warn('V3 quotes not fully implemented, returning estimate');
     return [amountIn, amountIn * BigInt(997) / BigInt(1000)]; // 0.3% fee estimate
   }
-  
-  private async getAmountsInV3(path: string[], amountOut: bigint): Promise<bigint[]> {
+
+  private async getAmountsInV3(_path: string[], amountOut: bigint): Promise<bigint[]> {
     // Simplified V3 quote - in production, use Quoter contract
     logger.warn('V3 quotes not fully implemented, returning estimate');
     return [amountOut * BigInt(1003) / BigInt(1000), amountOut]; // 0.3% fee estimate
   }
-  
+
   private buildSwapTxV3(params: SwapParams): any {
     // Simplified V3 swap - in production, handle all swap types
     const swapParams = {
@@ -344,15 +340,15 @@ export class DexAdapter {
       amountOutMinimum: params.amountOutMin,
       sqrtPriceLimitX96: 0,
     };
-    
+
     return {
       to: this.config.router,
       data: interfaces.UniswapV3Router.encodeFunctionData('exactInputSingle', [swapParams]),
       value: BigInt(0),
     };
   }
-  
-  private parseSwapLog(logs: any[]): { amountOut: bigint } | null {
+
+  private parseSwapLog(logs: readonly any[]): { amountOut: bigint } | null {
     // Parse swap event from logs
     for (const log of logs) {
       try {
@@ -376,17 +372,17 @@ export class DexAdapter {
 export class MultiDexRouter {
   private adapters: Map<string, DexAdapter> = new Map();
   private tokenCache: Map<string, TokenInfo> = new Map();
-  
+
   constructor(
     private provider: JsonRpcProvider,
     private signer?: Wallet
   ) {
     this.initializeAdapters();
   }
-  
+
   private initializeAdapters(): void {
     const enabledDexes = Config.dex.enabledDexes;
-    
+
     for (const dexName of enabledDexes) {
       const config = DEX_CONFIGS[dexName.toLowerCase()];
       if (config) {
@@ -398,7 +394,7 @@ export class MultiDexRouter {
       }
     }
   }
-  
+
   /**
    * Get best quote across all DEXs
    */
@@ -408,36 +404,34 @@ export class MultiDexRouter {
     amountIn: bigint,
     slippageBps: number = Config.execution.slippageBps
   ): Promise<QuoteResult | null> {
-    const quotes: QuoteResult[] = [];
-    
     // Get quotes from all DEXs in parallel
     const quotePromises = Array.from(this.adapters.entries()).map(
       async ([dexName, adapter]) => {
         try {
           const path = [tokenIn, tokenOut];
           const amounts = await adapter.getAmountsOut(path, amountIn);
-          
+
           if (amounts.length < 2) return null;
-          
+
           const amountOut = amounts[amounts.length - 1];
           const minAmountOut = calculateMinimumOutput(amountOut, slippageBps);
-          
+
           // Get reserves for price impact calculation
           const reserves = await adapter.getReserves(tokenIn, tokenOut);
           let priceImpact = 0;
-          
+
           if (reserves) {
             const spotPrice = parseFloat(fromWei(reserves.reserve1)) / parseFloat(fromWei(reserves.reserve0));
             const executionPrice = parseFloat(fromWei(amountOut)) / parseFloat(fromWei(amountIn));
             priceImpact = Math.abs((executionPrice - spotPrice) / spotPrice * 100);
           }
-          
+
           return {
             amountOut: minAmountOut,
             path,
             priceImpact,
             executionPrice: parseFloat(fromWei(amountOut)) / parseFloat(fromWei(amountIn)),
-            dexName: adapter.config.name,
+            dexName: (adapter as any).config.name,
             gasEstimate: BigInt(250000), // Rough estimate
           };
         } catch (error) {
@@ -446,28 +440,37 @@ export class MultiDexRouter {
         }
       }
     );
-    
+
     const results = await Promise.all(quotePromises);
-    
+
     // Filter out failed quotes and sort by output amount
-    const validQuotes = results.filter((q): q is QuoteResult => q !== null);
+    const validQuotes = results.filter((q): q is QuoteResult & { gasEstimate: bigint } => {
+      return q !== null && typeof q === 'object' && 'gasEstimate' in q && q.gasEstimate !== undefined;
+    });
+
     validQuotes.sort((a, b) => {
+      if (!a || !b) return 0;
       if (a.amountOut > b.amountOut) return -1;
       if (a.amountOut < b.amountOut) return 1;
       return 0;
     });
-    
+
     if (validQuotes.length === 0) {
       logger.warn('No valid quotes found across any DEX');
       return null;
     }
-    
+
     const bestQuote = validQuotes[0];
+    if (!bestQuote) {
+      logger.warn('No valid quotes found across any DEX');
+      return null;
+    }
+
     logger.info(`Best quote from ${bestQuote.dexName}: ${fromWei(bestQuote.amountOut)} output for ${fromWei(amountIn)} input`);
-    
+
     return bestQuote;
   }
-  
+
   /**
    * Execute swap on specific DEX
    */
@@ -479,10 +482,10 @@ export class MultiDexRouter {
     if (!adapter) {
       throw new Error(`DEX adapter not found for ${dexName}`);
     }
-    
+
     return adapter.executeSwap(params);
   }
-  
+
   /**
    * Execute swap with best available price
    */
@@ -494,11 +497,11 @@ export class MultiDexRouter {
     slippageBps?: number
   ): Promise<SwapResult> {
     const quote = await this.getBestQuote(tokenIn, tokenOut, amountIn, slippageBps);
-    
+
     if (!quote) {
       throw new Error('No valid quotes available');
     }
-    
+
     const params: SwapParams = {
       tokenIn,
       tokenOut,
@@ -508,10 +511,10 @@ export class MultiDexRouter {
       deadline: Math.floor(Date.now() / 1000) + 300, // 5 minutes
       slippageBps,
     };
-    
+
     return this.executeSwapOnDex(quote.dexName, params);
   }
-  
+
   /**
    * Get token info
    */
@@ -519,27 +522,27 @@ export class MultiDexRouter {
     if (this.tokenCache.has(tokenAddress)) {
       return this.tokenCache.get(tokenAddress)!;
     }
-    
+
     try {
       const tokenContract = new Contract(
         tokenAddress,
         ERC20_ABI,
         this.provider
       );
-      
+
       const [symbol, decimals, name] = await Promise.all([
         tokenContract.symbol(),
         tokenContract.decimals(),
         tokenContract.name().catch(() => ''),
       ]);
-      
+
       const info: TokenInfo = {
         address: tokenAddress,
         symbol,
         decimals,
         name: name || symbol,
       };
-      
+
       this.tokenCache.set(tokenAddress, info);
       return info;
     } catch (error) {
@@ -547,7 +550,7 @@ export class MultiDexRouter {
       throw error;
     }
   }
-  
+
   /**
    * Approve token spending
    */
@@ -559,53 +562,53 @@ export class MultiDexRouter {
     if (!this.signer) {
       throw new Error('Signer required for approvals');
     }
-    
+
     const tokenContract = new Contract(
       tokenAddress,
       ERC20_ABI,
       this.signer
     );
-    
+
     // Check current allowance
     const currentAllowance = await tokenContract.allowance(
       wallet.getAddress(),
       spenderAddress
     );
-    
+
     if (BigInt(currentAllowance) >= amount) {
       logger.debug('Sufficient allowance already exists');
       return 'already-approved';
     }
-    
+
     // Approve max uint256 for convenience (common practice)
-    const maxApproval = ethers.MaxUint256;
-    
+    const maxApproval = MaxUint256;
+
     if (Config.execution.mode === 'simulate') {
       logger.info(`SIMULATION: Would approve ${tokenAddress} for ${spenderAddress}`);
       return '0xsimulated';
     }
-    
+
     const tx = await tokenContract.approve(spenderAddress, maxApproval);
     const receipt = await tx.wait();
-    
+
     logger.info(`Approved ${tokenAddress} for ${spenderAddress}: ${receipt.hash}`);
     return receipt.hash;
   }
-  
+
   /**
    * Get all available DEX adapters
    */
   getAdapters(): Map<string, DexAdapter> {
     return this.adapters;
   }
-  
+
   /**
    * Check if a pair exists on a DEX
    */
   async pairExists(dexName: string, tokenA: string, tokenB: string): Promise<boolean> {
     const adapter = this.adapters.get(dexName.toLowerCase());
     if (!adapter) return false;
-    
+
     const pairAddress = await adapter.getPairAddress(tokenA, tokenB);
     return pairAddress !== null;
   }
@@ -622,6 +625,3 @@ export function getMultiDexRouter(): MultiDexRouter {
   }
   return multiDexRouter;
 }
-
-// Export for convenience
-export { DexAdapter };

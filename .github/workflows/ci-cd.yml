@@ -1,0 +1,122 @@
+name: Arbitrage Bot CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linter
+      run: npm run lint
+    
+    - name: Run unit tests
+      run: npm test
+    
+    - name: Run integration tests
+      run: npm run test:integration
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: docker build -t arbitrage-bot .
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'arbitrage-bot'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+  deploy:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy with flexible options
+      env:
+        DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET }}
+      run: |
+        case "$DEPLOY_TARGET" in
+          "aws")
+            # AWS ECS deployment
+            aws ecs update-service \
+              --cluster ${{ secrets.AWS_ECS_CLUSTER }} \
+              --service ${{ secrets.AWS_ECS_SERVICE }} \
+              --force-new-deployment
+            ;;
+          "gcp")
+            # Google Cloud Run deployment
+            gcloud run deploy arbitrage-bot \
+              --image gcr.io/${{ secrets.GCP_PROJECT }}/arbitrage-bot \
+              --platform managed
+            ;;
+          "azure")
+            # Azure Container Instances
+            az container create \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --name arbitrage-bot \
+              --image arbitrage-bot
+            ;;
+          *)
+            echo "No deployment target specified"
+            exit 1
+            ;;
+        esac
+
+  notify:
+    needs: [test, build, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Flexible Notification
+      env:
+        NOTIFICATION_CHANNEL: ${{ secrets.NOTIFICATION_CHANNEL }}
+      run: |
+        case "$NOTIFICATION_CHANNEL" in
+          "slack")
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"Deployment status: ${{ job.status }}"}' \
+              ${{ secrets.SLACK_WEBHOOK }}
+            ;;
+          "discord")
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"content":"Deployment status: ${{ job.status }}"}' \
+              ${{ secrets.DISCORD_WEBHOOK }}
+            ;;
+          "teams")
+            # Microsoft Teams webhook notification
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"Deployment status: ${{ job.status }}"}' \
+              ${{ secrets.TEAMS_WEBHOOK }}
+            ;;
+          *)
+            echo "No notification channel specified"
+            ;;
+        esac

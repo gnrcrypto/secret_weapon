@@ -1,0 +1,95 @@
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.894Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.907Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.908Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"simulate","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.908Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.909Z"}
+{"level":"info","message":"Running in SIMULATION mode - no real transactions will be executed","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.913Z"}
+{"level":"info","message":"Connected to Polygon network (chainId: 137)","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.915Z"}
+{"level":"info","message":"Initializing database connections...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.916Z"}
+{"level":"info","message":"Database connections established","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.916Z"}
+{"level":"info","message":"Initializing services...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.916Z"}
+{"level":"info","message":"Services initialized","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.916Z"}
+{"level":"info","message":"Initialization complete","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"Bot is now running!","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"Start time: 2025-10-05T13:00:05.917Z","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"Main arbitrage loop started","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:00:05.917Z"}
+{"level":"info","message":"Received SIGINT, initiating graceful shutdown...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:01:51.371Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.247Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.250Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.251Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"simulate","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.252Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.252Z"}
+{"level":"info","message":"Running in SIMULATION mode - no real transactions will be executed","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.255Z"}
+{"level":"info","message":"Connected to Polygon network (chainId: 137)","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.257Z"}
+{"level":"info","message":"Initializing database connections...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.257Z"}
+{"level":"info","message":"Database connections established","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.257Z"}
+{"level":"info","message":"Initializing services...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.258Z"}
+{"level":"info","message":"Services initialized","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.258Z"}
+{"level":"info","message":"Initialization complete","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.258Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.258Z"}
+{"level":"info","message":"Bot is now running!","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.258Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.259Z"}
+{"level":"info","message":"Start time: 2025-10-05T13:04:51.259Z","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.259Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.259Z"}
+{"level":"info","message":"Main arbitrage loop started","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:04:51.259Z"}
+{"level":"info","message":"Received SIGINT, initiating graceful shutdown...","service":"polygon-arbitrage-bot","timestamp":"2025-10-05T13:05:02.331Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.188Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.191Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.193Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"simulate","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.194Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.194Z"}
+{"level":"info","message":"Running in SIMULATION mode - no real transactions will be executed","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.197Z"}
+{"level":"info","message":"Connected to Polygon network (chainId: 137)","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.199Z"}
+{"level":"info","message":"Initializing database connections...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.200Z"}
+{"level":"info","message":"Database connections established","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.200Z"}
+{"level":"info","message":"Initializing services...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.200Z"}
+{"level":"info","message":"Services initialized","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.200Z"}
+{"level":"info","message":"Initialization complete","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.200Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"Bot is now running!","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"Start time: 2025-10-06T02:17:05.201Z","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"Main arbitrage loop started","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:17:05.201Z"}
+{"level":"info","message":"Received SIGINT, initiating graceful shutdown...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:12.221Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.148Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.150Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.150Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"live","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.150Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.151Z"}
+{"level":"info","message":"Initializing wallet...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.151Z"}
+{"level":"info","message":"Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:19:20.340Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.027Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.028Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.029Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"live","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.030Z"}
+{"level":"info","message":"Initializing wallet...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.031Z"}
+{"level":"info","message":"Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:47:48.289Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.561Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.563Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.563Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"live","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.564Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.565Z"}
+{"level":"info","message":"Initializing wallet...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.565Z"}
+{"level":"info","message":"Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T02:59:24.811Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.770Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.777Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.778Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"live","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.779Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.779Z"}
+{"level":"info","message":"Initializing wallet...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.779Z"}
+{"level":"info","message":"Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:16.965Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.006Z"}
+{"level":"info","message":"Polygon Arbitrage Bot Starting...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.008Z"}
+{"level":"info","message":"==================================================","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.008Z"}
+{"dexes":["quickswap","sushiswap"],"level":"info","message":"Configuration:","minProfit":10,"mode":"live","network":137,"service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.009Z"}
+{"level":"info","message":"Initializing providers...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.009Z"}
+{"level":"info","message":"Initializing wallet...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.009Z"}
+{"level":"info","message":"Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.217Z"}
+{"level":"info","message":"Wallet Balance: 0.145700000326307559 MATIC","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.218Z"}
+{"level":"info","message":"Connected to Polygon network (chainId: 137)","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.220Z"}
+{"level":"info","message":"Initializing database connections...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.220Z"}
+{"level":"error","message":"Failed to start bot: Data type \"jsonb\" in \"WalletEntity.tokenBalances\" is not supported by \"sqlite\" database.","service":"polygon-arbitrage-bot","stack":"DataTypeNotSupportedError: Data type \"jsonb\" in \"WalletEntity.tokenBalances\" is not supported by \"sqlite\" database.\n    at /home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:133:31\n    at Array.forEach (<anonymous>)\n    at EntityMetadataValidator.validate (/home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:128:18)\n    at /home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:43:18\n    at Array.forEach (<anonymous>)\n    at EntityMetadataValidator.validateMany (/home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:42:25)\n    at DataSource.buildMetadatas (/home/nickypoo/secret_weapon/node_modules/src/data-source/DataSource.ts:753:33)\n    at async DataSource.initialize (/home/nickypoo/secret_weapon/node_modules/src/data-source/DataSource.ts:264:13)\n    at async ArbitrageBotApplication.initializeDatabase (/home/nickypoo/secret_weapon/src/index.ts:180:5)\n    at async ArbitrageBotApplication.initialize (/home/nickypoo/secret_weapon/src/index.ts:157:5)","timestamp":"2025-10-06T03:00:45.250Z"}

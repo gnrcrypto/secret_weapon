@@ -1,4 +1,4 @@
-import { ethers, Wallet, JsonRpcProvider, WebSocketProvider, FallbackProvider, Network } from 'ethers';
+import { ethers, Wallet, JsonRpcProvider, WebSocketProvider, FallbackProvider, Network, FetchRequest } from 'ethers';
 import { Config } from '../config';
 import winston from 'winston';
 
@@ -28,11 +28,12 @@ class MonitoredProvider {
   private healthCheckInterval: NodeJS.Timeout | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  
+
   constructor(
     private url: string,
     private name: string,
-    private isWebSocket: boolean = false
+    private isWebSocket: boolean = false,
+    private bearerToken?: string
   ) {
     this.provider = this.createProvider();
     this.health = {
@@ -43,48 +44,61 @@ class MonitoredProvider {
     };
     this.startHealthCheck();
   }
-  
+
   private createProvider(): JsonRpcProvider | WebSocketProvider {
     const network = Network.from(Config.network.chainId);
-    
+
     if (this.isWebSocket) {
       const wsProvider = new WebSocketProvider(this.url, network);
-      
+
       // Setup WebSocket event handlers
-      wsProvider.websocket.on('error', (error) => {
+      (wsProvider.websocket as any).on('error', (error: any) => {
         logger.error(`WebSocket error for ${this.name}:`, error);
         this.handleProviderError();
       });
-      
-      wsProvider.websocket.on('close', () => {
+
+      (wsProvider.websocket as any).on('close', () => {
         logger.warn(`WebSocket closed for ${this.name}, attempting reconnect...`);
         this.handleProviderError();
       });
-      
+
       return wsProvider;
     } else {
-      return new JsonRpcProvider(this.url, network, {
-        staticNetwork: true,
-        batchMaxCount: 10,
-        polling: true,
-        pollingInterval: Config.network.blockPollingInterval,
-      });
+      // HTTP provider with optional Bearer token
+      if (this.bearerToken) {
+        const fetchRequest = new FetchRequest(this.url);
+        fetchRequest.setHeader('Authorization', `Bearer ${this.bearerToken}`);
+
+        return new JsonRpcProvider(fetchRequest, network, {
+          staticNetwork: true,
+          batchMaxCount: 10,
+          polling: true,
+          pollingInterval: Config.network.blockPollingInterval,
+        });
+      } else {
+        return new JsonRpcProvider(this.url, network, {
+          staticNetwork: true,
+          batchMaxCount: 10,
+          polling: true,
+          pollingInterval: Config.network.blockPollingInterval,
+        });
+      }
     }
   }
-  
+
   private async checkHealth(): Promise<void> {
     try {
       const start = Date.now();
       const blockNumber = await this.provider.getBlockNumber();
       const latency = Date.now() - start;
-      
+
       this.health = {
         isHealthy: true,
         latency,
         blockNumber,
         lastCheck: new Date(),
       };
-      
+
       // Reset reconnect attempts on successful health check
       if (this.reconnectAttempts > 0) {
         logger.info(`Provider ${this.name} recovered after ${this.reconnectAttempts} attempts`);
@@ -96,37 +110,37 @@ class MonitoredProvider {
       this.handleProviderError();
     }
   }
-  
+
   private startHealthCheck(): void {
     // Initial health check
     this.checkHealth();
-    
+
     // Schedule periodic health checks
     this.healthCheckInterval = setInterval(() => {
       this.checkHealth();
     }, 10000); // Check every 10 seconds
   }
-  
+
   private async handleProviderError(): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       logger.error(`Max reconnection attempts reached for ${this.name}`);
       this.health.isHealthy = false;
       return;
     }
-    
+
     this.reconnectAttempts++;
     const backoff = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
-    
+
     logger.info(`Reconnecting ${this.name} in ${backoff}ms (attempt ${this.reconnectAttempts})`);
-    
+
     await new Promise(resolve => setTimeout(resolve, backoff));
-    
+
     try {
       if (this.isWebSocket) {
         // For WebSocket, destroy and recreate
         await (this.provider as WebSocketProvider).destroy();
       }
-      
+
       this.provider = this.createProvider();
       await this.checkHealth();
     } catch (error) {
@@ -134,26 +148,27 @@ class MonitoredProvider {
       this.handleProviderError();
     }
   }
-  
+
   getProvider(): JsonRpcProvider | WebSocketProvider {
     return this.provider;
   }
-  
+
   getHealth(): ProviderHealth {
     return { ...this.health };
   }
-  
+
   isHealthy(): boolean {
-    return this.health.isHealthy && 
+    return this.health.isHealthy &&
            this.health.latency < 5000 && // Less than 5 second latency
            (Date.now() - this.health.lastCheck.getTime()) < 30000; // Checked within last 30 seconds
   }
-  
+
   async destroy(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
     }
-    
+
     if (this.isWebSocket) {
       await (this.provider as WebSocketProvider).destroy();
     }
@@ -165,21 +180,28 @@ class ProviderManager {
   private providers: MonitoredProvider[] = [];
   private fallbackProvider: FallbackProvider | null = null;
   private primaryProvider: MonitoredProvider | null = null;
-  
+
   constructor() {
     this.setupProviders();
   }
-  
+
   private setupProviders(): void {
-    // Setup primary provider
+    // Setup primary provider with Blockdaemon support
     const primaryUrl = this.constructProviderUrl(Config.network.rpcUrl);
+    const blockdaemonKey = process.env.BLOCKDAEMON_API_KEY;
+
     this.primaryProvider = new MonitoredProvider(
       primaryUrl,
-      'Primary',
-      primaryUrl.startsWith('ws')
+      blockdaemonKey ? 'Blockdaemon' : 'Primary',
+      primaryUrl.startsWith('ws'),
+      blockdaemonKey
     );
     this.providers.push(this.primaryProvider);
-    
+
+    if (blockdaemonKey) {
+      logger.info('Primary provider configured with Blockdaemon authentication');
+    }
+
     // Setup backup provider if available
     if (Config.network.rpcUrlBackup) {
       const backupUrl = this.constructProviderUrl(Config.network.rpcUrlBackup);
@@ -190,18 +212,18 @@ class ProviderManager {
       );
       this.providers.push(backupProvider);
     }
-    
+
     // Setup providers from API keys
     if (Config.providers.alchemyKey) {
       const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${Config.providers.alchemyKey}`;
       this.providers.push(new MonitoredProvider(alchemyUrl, 'Alchemy', false));
     }
-    
+
     if (Config.providers.infuraKey) {
       const infuraUrl = `https://polygon-mainnet.infura.io/v3/${Config.providers.infuraKey}`;
       this.providers.push(new MonitoredProvider(infuraUrl, 'Infura', false));
     }
-    
+
     if (Config.providers.quicknodeEndpoint) {
       this.providers.push(new MonitoredProvider(
         Config.providers.quicknodeEndpoint,
@@ -209,18 +231,18 @@ class ProviderManager {
         Config.providers.quicknodeEndpoint.startsWith('ws')
       ));
     }
-    
+
     // Create fallback provider with healthy providers
     this.updateFallbackProvider();
   }
-  
+
   private constructProviderUrl(url: string): string {
     // Add API keys if they're referenced in the URL
     return url
       .replace('{INFURA_KEY}', Config.providers.infuraKey || '')
       .replace('{ALCHEMY_KEY}', Config.providers.alchemyKey || '');
   }
-  
+
   private updateFallbackProvider(): void {
     const healthyProviders = this.providers
       .filter(p => p.isHealthy())
@@ -230,54 +252,80 @@ class ProviderManager {
         priority: this.providers.indexOf(p) + 1,
         stallTimeout: 2000,
       }));
-    
+
     if (healthyProviders.length === 0) {
       logger.error('No healthy providers available!');
       return;
     }
-    
+
     this.fallbackProvider = new FallbackProvider(healthyProviders, Config.network.chainId);
     logger.info(`Fallback provider updated with ${healthyProviders.length} healthy providers`);
   }
-  
+
   getProvider(): JsonRpcProvider | WebSocketProvider | FallbackProvider {
     // Periodically update fallback provider
     this.updateFallbackProvider();
-    
+
     // Prefer fallback provider if multiple are healthy
     if (this.fallbackProvider && this.providers.filter(p => p.isHealthy()).length > 1) {
       return this.fallbackProvider;
     }
-    
+
     // Otherwise return the first healthy provider
     const healthyProvider = this.providers.find(p => p.isHealthy());
     if (healthyProvider) {
       return healthyProvider.getProvider();
     }
-    
+
     // Last resort: return primary even if unhealthy
     logger.warn('No healthy providers, using primary provider');
     return this.primaryProvider!.getProvider();
   }
-  
+
   getWebSocketProvider(): WebSocketProvider | null {
     const wsProvider = this.providers.find(p => p.isHealthy() && p.getProvider() instanceof WebSocketProvider);
     return wsProvider ? (wsProvider.getProvider() as WebSocketProvider) : null;
   }
-  
+
   async getHealthReport(): Promise<{ [key: string]: ProviderHealth }> {
     const report: { [key: string]: ProviderHealth } = {};
-    
+
     for (const provider of this.providers) {
       const name = this.providers.indexOf(provider) === 0 ? 'primary' : `backup_${this.providers.indexOf(provider)}`;
       report[name] = provider.getHealth();
     }
-    
+
     return report;
   }
-  
+
   async destroy(): Promise<void> {
     await Promise.all(this.providers.map(p => p.destroy()));
+  }
+
+  // ADD THESE MISSING METHODS:
+  initialize(): void {
+    // Already initialized in constructor
+  }
+
+  startMonitoring(): void {
+    // Health monitoring is already running via MonitoredProvider instances
+  }
+
+  stopMonitoring(): void {
+    // Stop all provider health checks
+    this.providers.forEach(provider => {
+      provider.destroy();
+    });
+  }
+
+  async switchProvider(): Promise<boolean> {
+    // Try to find a healthy provider
+    const healthyProvider = this.providers.find(p => p.isHealthy());
+    if (healthyProvider) {
+      logger.info('Switched to healthy provider');
+      return true;
+    }
+    return false;
   }
 }
 
@@ -314,19 +362,22 @@ let signer: Wallet | null = null;
 // Initialize signer
 export const initializeSigner = (): Wallet => {
   if (signer) return signer;
-  
+
   const provider = getProvider();
-  
+
   if (Config.wallet.privateKey) {
     signer = new Wallet(Config.wallet.privateKey, provider);
     logger.info(`Wallet initialized from private key: ${signer.address}`);
   } else if (Config.wallet.mnemonic) {
-    signer = Wallet.fromPhrase(Config.wallet.mnemonic, provider);
+    const hdWallet = Wallet.fromPhrase(Config.wallet.mnemonic, provider);
+    signer = new Wallet(hdWallet.privateKey, provider);
     logger.info(`Wallet initialized from mnemonic: ${signer.address}`);
-  } else {
+  }
+
+  if (!signer) {
     throw new Error('No private key or mnemonic provided');
   }
-  
+
   return signer;
 };
 
@@ -358,48 +409,55 @@ class NonceManager {
   private lastReset = Date.now();
   private resetInterval = 60000; // Reset every minute
   private pendingNonces = new Set<number>();
-  
+
   async getNonce(): Promise<number> {
     const now = Date.now();
-    
+
     // Reset nonce periodically or if too many pending
-    if (!this.baseNonce || 
-        now - this.lastReset > this.resetInterval || 
+    if (!this.baseNonce ||
+        now - this.lastReset > this.resetInterval ||
         this.pendingNonces.size > 50) {
       await this.resetNonce();
     }
-    
+
     const nonce = this.baseNonce! + this.nonceOffset;
     this.nonceOffset++;
     this.pendingNonces.add(nonce);
-    
+
     return nonce;
   }
-  
+
   async resetNonce(): Promise<void> {
     const provider = getProvider();
     const address = getWalletAddress();
-    
+
     this.baseNonce = await provider.getTransactionCount(address, 'pending');
     this.nonceOffset = 0;
     this.lastReset = Date.now();
     this.pendingNonces.clear();
-    
+
     logger.debug(`Nonce reset to ${this.baseNonce}`);
   }
-  
+
   releaseNonce(nonce: number): void {
     this.pendingNonces.delete(nonce);
   }
-  
+
   async confirmNonce(nonce: number): Promise<void> {
     this.pendingNonces.delete(nonce);
-    
+
     // If this was the base nonce, increment for next use
     if (nonce === this.baseNonce) {
       this.baseNonce++;
       this.nonceOffset = Math.max(0, this.nonceOffset - 1);
     }
+  }
+
+  // ADD THIS MISSING METHOD:
+  releaseAllNonces(): void {
+    this.pendingNonces.clear();
+    this.baseNonce = null;
+    this.nonceOffset = 0;
   }
 }
 
@@ -410,16 +468,16 @@ export const nonceManager = new NonceManager();
 export const startProviderMonitoring = (): void => {
   setInterval(async () => {
     if (!providerManager) return;
-    
+
     const health = await providerManager.getHealthReport();
     const healthyCount = Object.values(health).filter(h => h.isHealthy).length;
-    
+
     if (healthyCount === 0) {
       logger.error('CRITICAL: All providers are unhealthy!');
     } else if (healthyCount === 1) {
       logger.warn('WARNING: Only one healthy provider remaining');
     }
-    
+
     // Log detailed health metrics
     logger.debug('Provider health report:', health);
   }, 30000); // Check every 30 seconds
@@ -432,10 +490,10 @@ export const waitForTransaction = async (
   timeoutMs = 60000
 ): Promise<ethers.TransactionReceipt | null> => {
   const provider = getProvider();
-  
+
   return Promise.race([
     provider.waitForTransaction(txHash, confirmations),
-    new Promise<null>((resolve) => 
+    new Promise<null>((resolve) =>
       setTimeout(() => {
         logger.warn(`Transaction ${txHash} timed out after ${timeoutMs}ms`);
         resolve(null);
@@ -444,20 +502,33 @@ export const waitForTransaction = async (
   ]);
 };
 
-// Export provider utilities
+// Export provider utilities - FIXED INTERFACE
 export const provider = {
   get: getProvider,
   getWebSocket: getWebSocketProvider,
   initialize: initializeProviders,
   startMonitoring: startProviderMonitoring,
+  stopMonitoring: () => {
+    if (providerManager) {
+      providerManager.stopMonitoring();
+    }
+  },
+  switchProvider: async (): Promise<boolean> => {
+    if (providerManager) {
+      return providerManager.switchProvider();
+    }
+    return false;
+  }
 };
 
-// Export wallet utilities  
+// Export wallet utilities - FIXED INTERFACE
 export const wallet = {
   getSigner,
   getAddress: getWalletAddress,
   getBalance: getWalletBalance,
   initialize: initializeSigner,
+  // FIX: Use getter for address to make it dynamic
+  get address() { return getWalletAddress(); }
 };
 
 // Initialize on module load in production

@@ -13,15 +13,13 @@ Decimal.set({
  * Convert a human-readable amount to wei
  */
 export function toWei(amount: string | number, decimals: number = 18): bigint {
-  const multiplier = BigInt(10) ** BigInt(decimals);
-  
   if (typeof amount === 'number') {
     // Handle floating point numbers carefully
     const decimal = new Decimal(amount);
     const scaled = decimal.mul(new Decimal(10).pow(decimals));
     return BigInt(scaled.toFixed(0));
   }
-  
+
   // Parse string amounts
   const decimal = new Decimal(amount);
   const scaled = decimal.mul(new Decimal(10).pow(decimals));
@@ -78,7 +76,7 @@ export function applySlippage(
   slippageBps: number,
   isInput: boolean = false
 ): bigint {
-  return isInput 
+  return isInput
     ? calculateMaximumInput(amount, slippageBps)
     : calculateMinimumOutput(amount, slippageBps);
 }
@@ -90,17 +88,17 @@ export function calculatePriceImpact(
   inputAmount: bigint,
   outputAmount: bigint,
   reserveIn: bigint,
-  reserveOut: bigint
+  _reserveOut: bigint
 ): number {
   // Calculate spot price before trade
-  const spotPrice = new Decimal(reserveOut.toString()).div(reserveIn.toString());
-  
+  const spotPrice = new Decimal(_reserveOut.toString()).div(reserveIn.toString());
+
   // Calculate execution price
   const executionPrice = new Decimal(outputAmount.toString()).div(inputAmount.toString());
-  
+
   // Calculate price impact as percentage
   const priceImpact = spotPrice.sub(executionPrice).div(spotPrice).mul(100);
-  
+
   return Math.abs(priceImpact.toNumber());
 }
 
@@ -119,11 +117,11 @@ export function safeDiv(numerator: bigint, denominator: bigint, defaultValue: bi
  */
 export function calculatePercentage(value: bigint, total: bigint, precision: number = 2): string {
   if (total === BigInt(0)) return '0';
-  
+
   const percentage = new Decimal(value.toString())
     .div(new Decimal(total.toString()))
     .mul(100);
-  
+
   return percentage.toFixed(precision);
 }
 
@@ -151,11 +149,11 @@ export function getAmountOut(
 ): bigint {
   if (amountIn === BigInt(0)) return BigInt(0);
   if (reserveIn === BigInt(0) || reserveOut === BigInt(0)) return BigInt(0);
-  
+
   const amountInWithFee = amountIn * BigInt(10000 - feeBps);
   const numerator = amountInWithFee * reserveOut;
   const denominator = reserveIn * BigInt(10000) + amountInWithFee;
-  
+
   return numerator / denominator;
 }
 
@@ -171,10 +169,10 @@ export function getAmountIn(
   if (amountOut === BigInt(0)) return BigInt(0);
   if (reserveIn === BigInt(0) || reserveOut === BigInt(0)) return BigInt(0);
   if (amountOut >= reserveOut) return BigInt(0); // Not enough liquidity
-  
+
   const numerator = reserveIn * amountOut * BigInt(10000);
   const denominator = (reserveOut - amountOut) * BigInt(10000 - feeBps);
-  
+
   return numerator / denominator + BigInt(1); // Round up
 }
 
@@ -189,11 +187,11 @@ export function calculateNetProfit(
 ): { profitWei: bigint; profitUsd: number; isProfitable: boolean } {
   const gasCost = gasUsed * gasPrice;
   const profitWei = grossProfit - gasCost;
-  
+
   // Convert to USD (assuming grossProfit is in MATIC wei)
   const profitInMatic = parseFloat(fromWei(profitWei, 18));
   const profitUsd = profitInMatic * nativeTokenPriceUsd;
-  
+
   return {
     profitWei,
     profitUsd,
@@ -212,7 +210,7 @@ export function calculateCompoundInterest(
   const decimal = new Decimal(principal.toString());
   const rate = new Decimal(1 + ratePerPeriod);
   const compound = decimal.mul(rate.pow(periods));
-  
+
   return BigInt(compound.toFixed(0));
 }
 
@@ -221,14 +219,14 @@ export function calculateCompoundInterest(
  */
 export function calculateOptimalTradeSize(
   reserveIn: bigint,
-  reserveOut: bigint,
+  _reserveOut: bigint,
   maxInput: bigint,
-  feeBps: number = 30
+  _feeBps: number = 30
 ): bigint {
   // This is a simplified version
   // In practice, you'd want to use calculus or binary search
   // to find the optimal trade size that maximizes profit
-  
+
   // For now, return a conservative estimate (1% of reserves)
   const optimalSize = reserveIn / BigInt(100);
   return optimalSize < maxInput ? optimalSize : maxInput;
@@ -254,8 +252,7 @@ export function tokenAmountToUsd(
   tokenPriceUsd: number,
   tokenDecimals: number
 ): number {
-  const tokenAmount = fromWei(amount, tokenDecimals);
-  return parseFloat(tokenAmount) * tokenPriceUsd;
+  return parseFloat(fromWei(amount, tokenDecimals)) * tokenPriceUsd;
 }
 
 /**
@@ -263,12 +260,12 @@ export function tokenAmountToUsd(
  */
 export function calculateBpsDifference(value1: bigint, value2: bigint): number {
   if (value2 === BigInt(0)) return 0;
-  
+
   const diff = value1 > value2 ? value1 - value2 : value2 - value1;
   const bps = new Decimal(diff.toString())
     .div(new Decimal(value2.toString()))
     .mul(10000);
-  
+
   return Math.abs(bps.toNumber());
 }
 
@@ -318,7 +315,7 @@ export function normalizeDecimals(
   toDecimals: number = 18
 ): bigint {
   if (fromDecimals === toDecimals) return amount;
-  
+
   if (fromDecimals < toDecimals) {
     return amount * BigInt(10) ** BigInt(toDecimals - fromDecimals);
   } else {
