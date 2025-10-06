@@ -1,4 +1,4 @@
-import { Config } from '../config';
+import { ADDRESSES } from '../config';
 import { ethers, Contract } from 'ethers';
 
 export interface DexAdapter {
@@ -18,8 +18,8 @@ export class DexAdapterRegistry {
   }
 
   private initializeAdapters(): void {
-    const routerAddresses = Config.ADDRESSES.ROUTERS;
-    
+    const routerAddresses = ADDRESSES.ROUTERS;
+
     Object.entries(routerAddresses).forEach(([name, address]) => {
       this.adapters.set(name.toLowerCase(), {
         name,
@@ -27,7 +27,7 @@ export class DexAdapterRegistry {
         routerAddress: address as string,
         getAmountsOut: async (path: string[], amount: bigint) => {
           const routerContract = new Contract(
-            address as string, 
+            address as string,
             ['function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)'],
             this.provider
           );
@@ -45,9 +45,10 @@ export class DexAdapterRegistry {
   }
 
   private determineProtocol(name: string): string {
-    const protocolMap: {[key: string]: string} = {
+    const protocolMap: { [key: string]: string } = {
       'QUICKSWAP': 'uniswap-v2',
       'UNISWAP': 'uniswap-v2',
+      'UNISWAPV3': 'uniswap-v3',
       'SUSHISWAP': 'uniswap-v2',
     };
     return protocolMap[name] || 'unknown';
@@ -66,5 +67,5 @@ export class DexAdapterRegistry {
   }
 }
 
-export const createDexAdapterRegistry = (provider: ethers.Provider) => 
+export const createDexAdapterRegistry = (provider: ethers.Provider) =>
   new DexAdapterRegistry(provider);

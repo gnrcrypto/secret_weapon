@@ -57,8 +57,7 @@ export declare class TransactionBuilder {
     /**
      * Encode calldata for swap
      */
-    encodeSwapCalldata(inputToken: Token, // Removed unused routerAddress parameter
-    outputToken: Token, amountIn: bigint, minAmountOut: bigint, recipient: string, deadline: number): string;
+    encodeSwapCalldata(inputToken: Token, outputToken: Token, amountIn: bigint, minAmountOut: bigint, recipient: string, deadline: number): string;
     /**
      * Get deadline for transaction
      */

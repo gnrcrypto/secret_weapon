@@ -57,11 +57,11 @@ class MainOrchestrator {
         // Setup database connection
         this.dataSource = new typeorm_1.DataSource({
             type: 'postgres',
-            host: config_1.Config.database.host,
-            port: config_1.Config.database.port,
-            username: config_1.Config.database.username,
-            password: config_1.Config.database.password,
-            database: config_1.Config.database.name,
+            host: config_1.Config.database.host || 'localhost',
+            port: config_1.Config.database.port || 5432,
+            username: config_1.Config.database.username || '',
+            password: config_1.Config.database.password || '',
+            database: config_1.Config.database.name || 'arbitrage',
             entities: [trade_entity_1.TradeEntity, wallet_entity_1.WalletEntity, token_entity_1.TokenEntity, dex_entity_1.DexEntity],
             synchronize: process.env.NODE_ENV !== 'production',
             logging: config_1.Config.monitoring.logLevel === 'debug',
@@ -79,12 +79,14 @@ class MainOrchestrator {
             await this.dataSource.initialize();
             logger.info('✅ Database connected');
             // 2. Initialize ledger
-            this.ledger = new ledger_1.Ledger(this.dataSource);
+            this.ledger = (0, ledger_1.createLedger)(config_1.Config.database.accountingDbUrl || '');
             logger.info('✅ Ledger initialized');
             // 3. Initialize providers
             logger.info('🌐 Initializing blockchain providers...');
-            polygonProvider_1.provider.initialize();
-            polygonProvider_1.provider.startMonitoring();
+            if (typeof polygonProvider_1.provider.initialize === 'function')
+                polygonProvider_1.provider.initialize();
+            if (typeof polygonProvider_1.provider.startMonitoring === 'function')
+                polygonProvider_1.provider.startMonitoring();
             logger.info('✅ Providers initialized');
             // 4. Verify wallet
             await this.verifyWallet();
@@ -97,7 +99,7 @@ class MainOrchestrator {
             metricsService.start();
             logger.info('✅ Metrics service started');
             // Start health API
-            const healthAPI = (0, health_1.getHealthAPI)();
+            const healthAPI = new health_1.HealthAPI(metricsService);
             healthAPI.start();
             logger.info('✅ Health API started');
             // Initialize market watcher
@@ -122,7 +124,7 @@ class MainOrchestrator {
             return;
         }
         logger.info('💰 Verifying wallet...');
-        const address = polygonProvider_1.wallet.getAddress();
+        const address = typeof polygonProvider_1.wallet.getAddress === 'function' ? await polygonProvider_1.wallet.getAddress() : polygonProvider_1.wallet.address;
         const balance = await polygonProvider_1.wallet.getBalance();
         const balanceEther = ethers_1.ethers.formatEther(balance);
         logger.info(`📍 Wallet Address: ${address}`);
@@ -185,7 +187,7 @@ class MainOrchestrator {
             // Update metrics
             const metrics = (0, metrics_1.getMetricsService)();
             metrics.recordTrade('unknown', // Should be passed in result
-            'unknown', result.success, result.actualProfit ? parseFloat(ethers_1.ethers.formatEther(result.actualProfit)) * 0.8 : 0, result.gasUsed || BigInt(0), Date.now() - result.timestamp);
+            'unknown', result.success, result.actualProfit ? parseFloat(ethers_1.ethers.formatEther(result.actualProfit)) * 0.8 : 0, result.gasUsed || BigInt(0), Date.now() - (result.timestamp || Date.now()));
         });
         this.marketWatcher.on('error', (error) => {
             logger.error('❌ Watcher error:', error);
@@ -250,14 +252,16 @@ class MainOrchestrator {
      */
     displayStatus() {
         const riskManager = (0, riskManager_1.getRiskManager)();
-        const riskMetrics = riskManager.getMetrics();
+        const riskMetrics = riskManager.getMetrics ? riskManager.getMetrics() : {};
+        const dailyProfit = riskMetrics.dailyProfit || 0;
+        const dailyLoss = riskMetrics.dailyLoss || 0;
         logger.info('');
         logger.info('📈 Current Status:');
         logger.info('─'.repeat(40));
         logger.info(`Mode: ${config_1.Config.execution.mode}`);
-        logger.info(`Circuit Breaker: ${riskMetrics.circuitBreakerActive ? '🔴 ACTIVE' : '🟢 OK'}`);
-        logger.info(`Daily P&L: $${(riskMetrics.dailyProfit - riskMetrics.dailyLoss).toFixed(2)}`);
-        logger.info(`Daily Trades: ${riskMetrics.dailyTrades}`);
+        logger.info(`Circuit Breaker: ${(riskMetrics.circuitBreakerActive ? '🔴 ACTIVE' : '🟢 OK')}`);
+        logger.info(`Daily P&L: $${(dailyProfit - dailyLoss).toFixed(2)}`);
+        logger.info(`Daily Trades: ${riskMetrics.dailyTrades || 0}`);
         logger.info(`Enabled DEXes: ${config_1.Config.dex.enabledDexes.join(', ')}`);
         logger.info('─'.repeat(40));
         logger.info('');
@@ -273,10 +277,11 @@ class MainOrchestrator {
             if (this.marketWatcher) {
                 const status = this.marketWatcher.getStatus();
                 const performance = this.marketWatcher.getPerformanceMetrics();
+                const perfAny = performance || {};
                 logger.info('');
                 logger.info(`📊 Status Update (${uptime} min uptime)`);
-                logger.info(`Opportunities: ${status.opportunitiesFound} | Trades: ${status.tradesExecuted} | Profit: $${status.profitGenerated.toFixed(2)}`);
-                logger.info(`Memory: ${performance.memoryUsageMB} MB | Queue: ${performance.queueSize}`);
+                logger.info(`Opportunities: ${status.opportunitiesFound} | Trades: ${status.tradesExecuted} | Profit: $${(status.profitGenerated || 0).toFixed(2)}`);
+                logger.info(`Memory: ${perfAny.memoryUsageMB || 'n/a'} MB | Queue: ${perfAny.queueSize || 0}`);
             }
         }, 60000); // Every minute
     }
@@ -296,7 +301,9 @@ class MainOrchestrator {
         }
         // Cleanup risk manager
         const riskManager = (0, riskManager_1.getRiskManager)();
-        riskManager.destroy();
+        if (typeof riskManager.destroy === 'function') {
+            riskManager.destroy();
+        }
         logger.info('👋 Shutdown complete');
     }
 }

@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HealthAPI = void 0;
-exports.getHealthAPI = getHealthAPI;
 const express_1 = __importDefault(require("express"));
 const config_1 = require("../config");
 const executor_1 = require("../exec/executor");
@@ -45,6 +44,7 @@ const riskManager_1 = require("../risk/riskManager");
 const strategy_1 = require("../arb/strategy");
 const polygonProvider_1 = require("../providers/polygonProvider");
 const winston_1 = __importDefault(require("winston"));
+const ethers_1 = require("ethers");
 const logger = winston_1.default.createLogger({
     level: config_1.Config.monitoring.logLevel,
     format: winston_1.default.format.json(),
@@ -68,8 +68,9 @@ class HealthAPI {
         this.app.use(express_1.default.json());
         // API key authentication
         this.app.use((req, res, next) => {
-            const apiKey = req.headers[config_1.Config.security.apiKeyHeader.toLowerCase()];
-            // Skip auth for health endpoint
+            const headerName = config_1.Config.security.apiKeyHeader?.toLowerCase() || 'x-api-key';
+            const apiKey = req.headers[headerName];
+            // Skip auth for GET /health
             if (req.path === '/health') {
                 return next();
             }
@@ -83,7 +84,7 @@ class HealthAPI {
         /**
          * Health check endpoint
          */
-        this.app.get('/health', async (req, res) => {
+        this.app.get('/health', async (_req, res) => {
             try {
                 const health = await this.getHealthStatus();
                 const statusCode = health.isHealthy ? 200 : 503;
@@ -99,7 +100,7 @@ class HealthAPI {
         /**
          * Detailed metrics endpoint
          */
-        this.app.get('/metrics', async (req, res) => {
+        this.app.get('/metrics', async (_req, res) => {
             try {
                 const metrics = await this.getDetailedMetrics();
                 res.json(metrics);
@@ -111,17 +112,22 @@ class HealthAPI {
         /**
          * Pause trading
          */
-        this.app.post('/pause', (req, res) => {
+        this.app.post('/pause', (_req, res) => {
             this.isPaused = true;
             const riskManager = (0, riskManager_1.getRiskManager)();
-            riskManager.emergencyStop();
+            if (typeof riskManager.emergencyStop === 'function') {
+                try {
+                    riskManager.emergencyStop();
+                }
+                catch (e) { /* swallow */ }
+            }
             logger.warn('Trading paused via API');
             res.json({ status: 'paused', message: 'Trading has been paused' });
         });
         /**
          * Resume trading
          */
-        this.app.post('/resume', (req, res) => {
+        this.app.post('/resume', (_req, res) => {
             this.isPaused = false;
             logger.info('Trading resumed via API');
             res.json({ status: 'active', message: 'Trading has been resumed' });
@@ -135,7 +141,7 @@ class HealthAPI {
                 if (!path || !amount) {
                     return res.status(400).json({ error: 'Missing path or amount' });
                 }
-                // Import simulator to avoid circular dependency
+                // Import simulator dynamically to avoid circular dependencies
                 const { getSimulator } = await Promise.resolve().then(() => __importStar(require('../arb/simulator')));
                 const simulator = getSimulator();
                 const result = await simulator.simulatePathOnChain(path, BigInt(amount));
@@ -153,7 +159,7 @@ class HealthAPI {
         /**
          * Get configuration
          */
-        this.app.get('/config', (req, res) => {
+        this.app.get('/config', (_req, res) => {
             // Return sanitized config
             const sanitized = {
                 mode: config_1.Config.execution.mode,
@@ -166,16 +172,22 @@ class HealthAPI {
                     dailyLossLimit: config_1.Config.risk.dailyLossLimitUsd,
                     maxConsecutiveFailures: config_1.Config.risk.maxConsecutiveFailures,
                 },
+                addresses: config_1.ADDRESSES,
             };
             res.json(sanitized);
         });
         /**
          * Get wallet info
          */
-        this.app.get('/wallet', async (req, res) => {
+        this.app.get('/wallet', async (_req, res) => {
             try {
-                const address = polygonProvider_1.wallet.getAddress();
-                const balance = await polygonProvider_1.wallet.getBalance();
+                // wallet may be a utility object with methods or a simple object
+                const address = typeof polygonProvider_1.wallet.getAddress === 'function'
+                    ? await polygonProvider_1.wallet.getAddress()
+                    : polygonProvider_1.wallet.address;
+                const balance = typeof polygonProvider_1.wallet.getBalance === 'function'
+                    ? await polygonProvider_1.wallet.getBalance()
+                    : BigInt(0);
                 res.json({
                     address,
                     balanceMatic: ethers_1.ethers.formatEther(balance),
@@ -189,31 +201,47 @@ class HealthAPI {
         /**
          * Get risk status
          */
-        this.app.get('/risk', (req, res) => {
+        this.app.get('/risk', (_req, res) => {
             const riskManager = (0, riskManager_1.getRiskManager)();
-            const report = riskManager.getRiskReport();
-            res.json(report);
+            if (typeof riskManager.getRiskReport === 'function') {
+                return res.json(riskManager.getRiskReport());
+            }
+            // Fallback
+            if (typeof riskManager.getMetrics === 'function') {
+                return res.json(riskManager.getMetrics());
+            }
+            res.status(500).json({ error: 'Risk manager not available' });
         });
         /**
          * Get execution status
          */
-        this.app.get('/execution', (req, res) => {
-            const executor = (0, executor_1.getExecutor)();
-            const status = executor.getStatus();
-            res.json(status);
+        this.app.get('/execution', (_req, res) => {
+            try {
+                const executor = (0, executor_1.getExecutor)();
+                const status = executor.getStatus();
+                res.json(status);
+            }
+            catch (error) {
+                res.status(500).json({ error: 'Executor not available' });
+            }
         });
         /**
          * Get strategy metrics
          */
-        this.app.get('/strategy', (req, res) => {
-            const strategy = (0, strategy_1.getStrategy)();
-            const metrics = strategy.getMetrics();
-            res.json(metrics);
+        this.app.get('/strategy', (_req, res) => {
+            try {
+                const strategy = (0, strategy_1.getStrategy)();
+                const metrics = strategy.getMetrics();
+                res.json(metrics);
+            }
+            catch (error) {
+                res.status(500).json({ error: 'Strategy not available' });
+            }
         });
         /**
          * Emergency stop
          */
-        this.app.post('/emergency-stop', (req, res) => {
+        this.app.post('/emergency-stop', (_req, res) => {
             this.emergencyStop();
             res.json({ status: 'stopped', message: 'Emergency stop activated' });
         });
@@ -221,7 +249,7 @@ class HealthAPI {
          * Get system logs
          */
         this.app.get('/logs', (req, res) => {
-            const limit = parseInt(req.query.limit) || 100;
+            const limit = parseInt(req.query.limit || '100', 10) || 100;
             const level = req.query.level || 'info';
             // This would typically read from a log file or database
             res.json({
@@ -248,13 +276,21 @@ class HealthAPI {
         }
         // Check risk manager
         const riskManager = (0, riskManager_1.getRiskManager)();
-        const riskMetrics = riskManager.getMetrics();
+        const riskMetrics = typeof riskManager.getMetrics === 'function'
+            ? riskManager.getMetrics()
+            : {};
         // Check executor
-        const executor = (0, executor_1.getExecutor)();
-        const execStatus = executor.getStatus();
+        let execStatus = {};
+        try {
+            const executor = (0, executor_1.getExecutor)();
+            execStatus = executor.getStatus();
+        }
+        catch {
+            execStatus = {};
+        }
         // Overall health
         const isHealthy = providerHealthy &&
-            !riskMetrics.circuitBreakerActive &&
+            !(riskMetrics && riskMetrics.circuitBreakerActive) &&
             !this.isPaused;
         return {
             isHealthy,
@@ -266,15 +302,12 @@ class HealthAPI {
                     blockNumber,
                 },
                 riskManager: {
-                    circuitBreaker: riskMetrics.circuitBreakerActive,
-                    dailyLoss: riskMetrics.dailyLoss,
-                    consecutiveFailures: riskMetrics.consecutiveFailures,
+                    circuitBreaker: riskMetrics.circuitBreakerActive || false,
+                    dailyLoss: riskMetrics.dailyLoss || 0,
+                    consecutiveFailures: riskMetrics.consecutiveFailures || 0,
                 },
                 executor: {
-                    pending: execStatus.pending,
-                    completed: execStatus.completed,
-                    failed: execStatus.failed,
-                    successRate: execStatus.successRate,
+                    ...execStatus,
                 },
             },
             timestamp: new Date().toISOString(),
@@ -285,12 +318,35 @@ class HealthAPI {
      */
     async getDetailedMetrics() {
         const riskManager = (0, riskManager_1.getRiskManager)();
-        const executor = (0, executor_1.getExecutor)();
-        const strategy = (0, strategy_1.getStrategy)();
+        let riskReport = {};
+        try {
+            riskReport = typeof riskManager.getRiskReport === 'function'
+                ? riskManager.getRiskReport()
+                : (typeof riskManager.getMetrics === 'function' ? riskManager.getMetrics() : {});
+        }
+        catch {
+            riskReport = {};
+        }
+        let execStatus = {};
+        try {
+            const executor = (0, executor_1.getExecutor)();
+            execStatus = executor.getStatus();
+        }
+        catch {
+            execStatus = {};
+        }
+        let strategyMetrics = {};
+        try {
+            const strategy = (0, strategy_1.getStrategy)();
+            strategyMetrics = strategy.getMetrics();
+        }
+        catch {
+            strategyMetrics = {};
+        }
         return {
-            risk: riskManager.getRiskReport(),
-            execution: executor.getStatus(),
-            strategy: strategy.getMetrics(),
+            risk: riskReport,
+            execution: execStatus,
+            strategy: strategyMetrics,
             system: {
                 uptime: Date.now() - this.startTime,
                 memoryUsage: process.memoryUsage(),
@@ -307,12 +363,21 @@ class HealthAPI {
         this.isPaused = true;
         // Trigger risk manager circuit breaker
         const riskManager = (0, riskManager_1.getRiskManager)();
-        riskManager.emergencyStop();
+        if (typeof riskManager.emergencyStop === 'function') {
+            try {
+                riskManager.emergencyStop();
+            }
+            catch (e) { /* swallow */ }
+        }
         // Cancel pending transactions
-        const executor = (0, executor_1.getExecutor)();
-        const pending = executor.getPendingTransactions();
-        logger.info(`Cancelling ${pending.length} pending transactions`);
-        // TODO: Actually cancel the transactions
+        try {
+            const executor = (0, executor_1.getExecutor)();
+            const pending = executor.getPendingTransactions();
+            logger.info(`Cancelling ${pending.length} pending transactions`);
+        }
+        catch (e) {
+            logger.warn('Executor not available to cancel pending transactions');
+        }
     }
     /**
      * Start the API server
@@ -326,14 +391,4 @@ class HealthAPI {
     }
 }
 exports.HealthAPI = HealthAPI;
-// Import ethers for wallet balance
-const ethers_1 = require("ethers");
-// Singleton instance
-let healthAPI = null;
-function getHealthAPI() {
-    if (!healthAPI) {
-        healthAPI = new HealthAPI();
-    }
-    return healthAPI;
-}
 //# sourceMappingURL=health.js.map

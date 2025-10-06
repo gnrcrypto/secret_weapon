@@ -120,7 +120,9 @@ class Ledger {
             (dex.averagePriceImpact * (dex.totalTrades - 1) + trade.priceImpact) / dex.totalTrades;
         await this.dexRepo.save(dex);
     }
-    async getPnL(startDate, endDate, walletAddress) {
+    async getPnL(startDate, endDate
+    // removed walletAddress? param as it was unused
+    ) {
         const query = this.tradeRepo
             .createQueryBuilder('trade')
             .where('trade.createdAt BETWEEN :startDate AND :endDate', {

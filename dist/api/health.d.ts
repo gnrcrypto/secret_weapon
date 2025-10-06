@@ -22,5 +22,4 @@ export declare class HealthAPI {
      */
     start(port?: number): void;
 }
-export declare function getHealthAPI(): HealthAPI;
 //# sourceMappingURL=health.d.ts.map

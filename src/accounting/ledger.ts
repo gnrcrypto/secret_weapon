@@ -149,8 +149,8 @@ export class Ledger {
 
   async getPnL(
     startDate: Date,
-    endDate: Date,
-    walletAddress?: string
+    endDate: Date
+    // removed walletAddress? param as it was unused
   ): Promise<{
     totalProfit: number;
     totalLoss: number;

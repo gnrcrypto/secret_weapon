@@ -118,10 +118,10 @@ class FlashloanExecutor {
      */
     getRouterAddress(dex) {
         const routers = {
-            'quickswap': config_1.Config.ADDRESSES.ROUTERS.QUICKSWAP,
-            'sushiswap': config_1.Config.ADDRESSES.ROUTERS.SUSHISWAP,
-            'uniswapv3': config_1.Config.ADDRESSES.ROUTERS.UNISWAP,
-            'uniswap': config_1.Config.ADDRESSES.ROUTERS.UNISWAP,
+            'quickswap': config_1.ADDRESSES.ROUTERS.QUICKSWAP,
+            'sushiswap': config_1.ADDRESSES.ROUTERS.SUSHISWAP,
+            'uniswapv3': config_1.ADDRESSES.ROUTERS.UNISWAPV3,
+            'uniswap': config_1.ADDRESSES.ROUTERS.UNISWAPV3,
         };
         const router = routers[dex.toLowerCase()];
         if (!router) {

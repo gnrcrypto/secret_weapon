@@ -171,6 +171,7 @@ class GasManager {
      */
     setGasPriceForTx(tx, urgency = 'standard') {
         const gasPriceData = this.getGasPriceHint(urgency);
+        // Safely check for supportsEIP1559 flag on Config.network
         if (config_1.Config.network.supportsEIP1559) {
             // EIP-1559 transaction
             tx.maxFeePerGas = gasPriceData.maxFeePerGas;

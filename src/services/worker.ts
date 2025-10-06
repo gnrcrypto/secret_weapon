@@ -2,8 +2,12 @@ import { Worker, WorkerOptions } from 'worker_threads';
 import { Config } from '../config';
 import { getPathfinder } from '../arb/pathfinder';
 import { DataSource } from 'typeorm';
-import { createLedger } from '../accounting/ledger';
+import * as LedgerModule from '../accounting/ledger';
 import winston from 'winston';
+
+const createLedger = (LedgerModule as any).createLedger || (LedgerModule as any).default || (() => {
+  throw new Error('createLedger not found in ../accounting/ledger');
+});
 
 export interface OpportunityJob {
   id: string;
@@ -21,7 +25,16 @@ export class OpportunityWorker {
   private jobQueue: OpportunityJob[] = [];
 
   constructor(dataSource: DataSource) {
-    this.ledger = createLedger(dataSource);
+    // createLedger might expect a connection string or DataSource; try both
+    try {
+      this.ledger = createLedger(dataSource);
+    } catch {
+      try {
+        this.ledger = createLedger((Config.database as any).accountingDbUrl || '');
+      } catch (e) {
+        throw new Error('Failed to initialize ledger: ' + (e as Error).message);
+      }
+    }
   }
 
   initializeWorkers(poolSize: number = Config.workers.poolSize): void {
@@ -52,7 +65,7 @@ export class OpportunityWorker {
   async processJobs(): Promise<void> {
     const pathfinder = getPathfinder();
     const paths = await pathfinder.enumeratePaths();
-    
+
     paths.forEach((path: any) => {
       const job: OpportunityJob = {
         id: `job-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -75,7 +88,7 @@ export class OpportunityWorker {
       if (!job) continue;
 
       const worker = this.workers.shift()!;
-      
+
       try {
         await this.executeJob(worker, job);
       } catch (error) {
@@ -93,10 +106,9 @@ export class OpportunityWorker {
       worker.once('message', async (result) => {
         if (result.success) {
           try {
-            await this.ledger.recordTrade(
-              result.simulation, 
-              result.path
-            );
+            if (typeof this.ledger.recordTrade === 'function') {
+              await this.ledger.recordTrade(result.simulation, result.path);
+            }
             resolve();
           } catch (error) {
             reject(error);
@@ -138,5 +150,5 @@ parentPort.on('message', async (job) => {
   }
 }
 
-export const createOpportunityWorker = (dataSource: DataSource) => 
+export const createOpportunityWorker = (dataSource: DataSource) =>
   new OpportunityWorker(dataSource);

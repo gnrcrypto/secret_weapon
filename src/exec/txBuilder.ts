@@ -27,7 +27,7 @@ const logger = winston.createLogger({
 const ROUTER_ADDRESSES: { [key: string]: string } = {
   QUICKSWAP: ADDRESSES.ROUTERS.QUICKSWAP,
   SUSHISWAP: ADDRESSES.ROUTERS.SUSHISWAP,
-  UNISWAP: ADDRESSES.ROUTERS.UNISWAP,
+  UNISWAP: ADDRESSES.ROUTERS.UNISWAPV3, // Use UNISWAPV3 for uniswap alias
 };
 
 // Add missing AAVE and Balancer addresses
@@ -432,7 +432,7 @@ export class TransactionBuilder {
    * Encode calldata for swap
    */
   encodeSwapCalldata(
-    inputToken: Token, // Removed unused routerAddress parameter
+    inputToken: Token,
     outputToken: Token,
     amountIn: bigint,
     minAmountOut: bigint,
@@ -481,11 +481,6 @@ export class TransactionBuilder {
     }
 
     logger.info('Building MEV protected transaction');
-
-    // Add MEV protection by:
-    // 1. Using commit-reveal scheme
-    // 2. Adding minimal slippage
-    // 3. Using private mempool if available
 
     const protectedTx = { ...baseTx };
 
@@ -570,9 +565,6 @@ export class TransactionBuilder {
       logger.error('Invalid nonce');
       return false;
     }
-
-    // Check value for non-payable functions
-    // Most DEX swaps are non-payable unless swapping ETH
 
     return true;
   }

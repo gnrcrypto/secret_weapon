@@ -15,7 +15,7 @@ export declare class Ledger {
     private updateWalletStats;
     private updateTokenStats;
     private updateDexStats;
-    getPnL(startDate: Date, endDate: Date, walletAddress?: string): Promise<{
+    getPnL(startDate: Date, endDate: Date): Promise<{
         totalProfit: number;
         totalLoss: number;
         netPnL: number;

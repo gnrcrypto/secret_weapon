@@ -27,7 +27,7 @@ const logger = winston_1.default.createLogger({
 const ROUTER_ADDRESSES = {
     QUICKSWAP: config_1.ADDRESSES.ROUTERS.QUICKSWAP,
     SUSHISWAP: config_1.ADDRESSES.ROUTERS.SUSHISWAP,
-    UNISWAP: config_1.ADDRESSES.ROUTERS.UNISWAP,
+    UNISWAP: config_1.ADDRESSES.ROUTERS.UNISWAPV3, // Use UNISWAPV3 for uniswap alias
 };
 // Add missing AAVE and Balancer addresses
 const FLASH_LOAN_ADDRESSES = {
@@ -303,8 +303,7 @@ class TransactionBuilder {
     /**
      * Encode calldata for swap
      */
-    encodeSwapCalldata(inputToken, // Removed unused routerAddress parameter
-    outputToken, amountIn, minAmountOut, recipient, deadline) {
+    encodeSwapCalldata(inputToken, outputToken, amountIn, minAmountOut, recipient, deadline) {
         const path = [inputToken.address, outputToken.address];
         return abi_1.interfaces.UniswapV2Router.encodeFunctionData('swapExactTokensForTokens', [amountIn, minAmountOut, path, recipient, deadline]);
     }
@@ -336,10 +335,6 @@ class TransactionBuilder {
             return baseTx;
         }
         logger.info('Building MEV protected transaction');
-        // Add MEV protection by:
-        // 1. Using commit-reveal scheme
-        // 2. Adding minimal slippage
-        // 3. Using private mempool if available
         const protectedTx = { ...baseTx };
         // Mark as MEV protected
         protectedTx.metadata.description += ' [MEV Protected]';
@@ -400,8 +395,6 @@ class TransactionBuilder {
             logger.error('Invalid nonce');
             return false;
         }
-        // Check value for non-payable functions
-        // Most DEX swaps are non-payable unless swapping ETH
         return true;
     }
     /**

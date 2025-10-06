@@ -108,7 +108,7 @@ class ArbitrageBotApplication {
             logger.info('Initializing wallet...');
             if (typeof polygonProvider_1.wallet.initialize === 'function')
                 polygonProvider_1.wallet.initialize();
-            const address = polygonProvider_1.wallet.getAddress ? await polygonProvider_1.wallet.getAddress() : polygonProvider_1.wallet.address;
+            const address = typeof polygonProvider_1.wallet.getAddress === 'function' ? await polygonProvider_1.wallet.getAddress() : polygonProvider_1.wallet.address;
             const balance = await polygonProvider_1.wallet.getBalance();
             logger.info(`Wallet Address: ${address}`);
             logger.info(`Wallet Balance: ${ethers_1.ethers.formatEther(balance)} MATIC`);

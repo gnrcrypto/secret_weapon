@@ -11,7 +11,7 @@ class DexAdapterRegistry {
         this.initializeAdapters();
     }
     initializeAdapters() {
-        const routerAddresses = config_1.Config.ADDRESSES.ROUTERS;
+        const routerAddresses = config_1.ADDRESSES.ROUTERS;
         Object.entries(routerAddresses).forEach(([name, address]) => {
             this.adapters.set(name.toLowerCase(), {
                 name,
@@ -35,6 +35,7 @@ class DexAdapterRegistry {
         const protocolMap = {
             'QUICKSWAP': 'uniswap-v2',
             'UNISWAP': 'uniswap-v2',
+            'UNISWAPV3': 'uniswap-v3',
             'SUSHISWAP': 'uniswap-v2',
         };
         return protocolMap[name] || 'unknown';

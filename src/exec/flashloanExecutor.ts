@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Config } from '../config';
+import { ADDRESSES, Config } from '../config';
 import { provider } from '../providers/polygonProvider';
 import { ArbitragePath } from '../arb/pathfinder';
 import winston from 'winston';
@@ -19,13 +19,13 @@ export class FlashloanExecutor {
   constructor() {
     const currentProvider = provider.get();
     const privateKey = Config.wallet.privateKey;
-    
+
     if (!privateKey) {
       throw new Error('Private key is required for flashloan executor');
     }
 
     this.wallet = new ethers.Wallet(privateKey, currentProvider);
-    
+
     const contractAddress = process.env.FLASHLOAN_CONTRACT_ADDRESS;
     if (!contractAddress) {
       throw new Error('FLASHLOAN_CONTRACT_ADDRESS not set in .env');
@@ -68,7 +68,7 @@ export class FlashloanExecutor {
       winston.info('Executing flashloan arbitrage', {
         token: borrowToken,
         amount: amountIn.toString(),
-        path: path.tokens.map(t => t.symbol).join(' -> '),
+        path: path.tokens.map(t => (t as any).symbol).join(' -> '),
         dexes: path.dexes.join(' -> '),
       });
 
@@ -107,19 +107,19 @@ export class FlashloanExecutor {
       }
 
       return { success: true, transactionHash: receipt.hash };
-      
+
     } catch (error: any) {
       winston.error('Flashloan execution failed:', error);
-      
+
       // Parse revert reason if available
       let errorMsg = String(error);
       if (error.data) {
         try {
           const decodedError = this.contract.interface.parseError(error.data);
           errorMsg = decodedError?.name || errorMsg;
-        } catch {}
+        } catch { }
       }
-      
+
       return { success: false, error: errorMsg };
     }
   }
@@ -143,7 +143,7 @@ export class FlashloanExecutor {
 
       const expectedProfit = await this.contract.simulateArbitrage(params, amountIn);
       return expectedProfit;
-      
+
     } catch (error) {
       winston.error('Simulation failed:', error);
       return BigInt(0);
@@ -155,10 +155,10 @@ export class FlashloanExecutor {
    */
   private getRouterAddress(dex: string): string {
     const routers: Record<string, string> = {
-      'quickswap': Config.ADDRESSES.ROUTERS.QUICKSWAP,
-      'sushiswap': Config.ADDRESSES.ROUTERS.SUSHISWAP,
-      'uniswapv3': Config.ADDRESSES.ROUTERS.UNISWAP,
-      'uniswap': Config.ADDRESSES.ROUTERS.UNISWAP,
+      'quickswap': ADDRESSES.ROUTERS.QUICKSWAP,
+      'sushiswap': ADDRESSES.ROUTERS.SUSHISWAP,
+      'uniswapv3': ADDRESSES.ROUTERS.UNISWAPV3,
+      'uniswap': ADDRESSES.ROUTERS.UNISWAPV3,
     };
 
     const router = routers[dex.toLowerCase()];
@@ -178,18 +178,18 @@ export class FlashloanExecutor {
       const expectedOwner = this.wallet.address;
 
       if (owner.toLowerCase() !== expectedOwner.toLowerCase()) {
-        winston.error('Contract owner mismatch', { 
-          contractOwner: owner, 
-          walletAddress: expectedOwner 
+        winston.error('Contract owner mismatch', {
+          contractOwner: owner,
+          walletAddress: expectedOwner
         });
         return false;
       }
 
-      winston.info('Flashloan contract verified', { 
+      winston.info('Flashloan contract verified', {
         address: await this.contract.getAddress(),
-        owner: owner 
+        owner: owner
       });
-      
+
       return true;
     } catch (error) {
       winston.error('Failed to verify contract setup:', error);

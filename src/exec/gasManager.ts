@@ -224,7 +224,8 @@ export class GasManager {
   ): any {
     const gasPriceData = this.getGasPriceHint(urgency);
 
-    if (Config.network.supportsEIP1559) {
+    // Safely check for supportsEIP1559 flag on Config.network
+    if ((Config.network as any).supportsEIP1559) {
       // EIP-1559 transaction
       tx.maxFeePerGas = gasPriceData.maxFeePerGas;
       tx.maxPriorityFeePerGas = gasPriceData.priorityFee;

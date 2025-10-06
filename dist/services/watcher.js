@@ -8,7 +8,6 @@ const config_1 = require("../config");
 const pathfinder_1 = require("../arb/pathfinder");
 const simulator_1 = require("../arb/simulator");
 const strategy_1 = require("../arb/strategy");
-const executor_1 = require("../exec/executor");
 const riskManager_1 = require("../risk/riskManager");
 const polygonProvider_1 = require("../providers/polygonProvider");
 const math_1 = require("../utils/math");
@@ -20,9 +19,7 @@ const logger = winston_1.default.createLogger({
     format: winston_1.default.format.json(),
     defaultMeta: { service: 'market-watcher' },
     transports: [
-        new winston_1.default.transports.Console({
-            format: winston_1.default.format.simple(),
-        }),
+        new winston_1.default.transports.Console({ format: winston_1.default.format.simple() }),
     ],
 });
 class MarketWatcher extends events_1.EventEmitter {
@@ -39,14 +36,11 @@ class MarketWatcher extends events_1.EventEmitter {
     constructor(dataSource) {
         super();
         this.dataSource = dataSource;
-        this.blockQueue = new p_queue_1.default({
-            concurrency: 1,
-            timeout: 30000,
-        });
+        this.blockQueue = new p_queue_1.default({ concurrency: 1, timeout: 30000 });
         this.setupEventListeners();
     }
     setupEventListeners() {
-        const riskManager = (0, riskManager_1.getRiskManager)();
+        const riskManager = new riskManager_1.RiskManager();
         riskManager.on('circuit-breaker-triggered', (reason) => {
             logger.error(`Circuit breaker triggered: ${reason}`);
             this.pause();
@@ -160,7 +154,7 @@ class MarketWatcher extends events_1.EventEmitter {
                 }
             }));
             // Filter out failed simulations
-            const validSimulations = simulations.filter(s => s !== null && s.isProfitable);
+            const validSimulations = simulations.filter((s) => s !== null && s.isProfitable);
             if (validSimulations.length === 0) {
                 return [];
             }
@@ -180,8 +174,8 @@ class MarketWatcher extends events_1.EventEmitter {
         if (opportunities.length === 0) {
             return { executed: 0, totalProfit: 0 };
         }
-        const executor = (0, executor_1.getExecutor)();
-        const riskManager = (0, riskManager_1.getRiskManager)();
+        const executor = (0, strategy_1.getStrategy)();
+        const riskManager = new riskManager_1.RiskManager();
         const strategy = (0, strategy_1.getStrategy)();
         let executed = 0;
         let totalProfit = 0;
@@ -220,7 +214,6 @@ class MarketWatcher extends events_1.EventEmitter {
         return { executed, totalProfit };
     }
     async analyzePendingTransaction(txHash) {
-        // Ensure property exists in config
         if (!config_1.Config.features.enableSandwichProtection) {
             return;
         }

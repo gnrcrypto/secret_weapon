@@ -123,7 +123,7 @@ class ArbitrageBotApplication {
       logger.info('Initializing wallet...');
       if (typeof wallet.initialize === 'function') wallet.initialize();
 
-      const address = wallet.getAddress ? await wallet.getAddress() : wallet.address;
+      const address = typeof wallet.getAddress === 'function' ? await wallet.getAddress() : wallet.address;
       const balance = await wallet.getBalance();
       logger.info(`Wallet Address: ${address}`);
       logger.info(`Wallet Balance: ${ethers.formatEther(balance)} MATIC`);

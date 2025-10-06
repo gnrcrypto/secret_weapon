@@ -2,8 +2,7 @@ import { Config } from '../config';
 import { getPathfinder } from '../arb/pathfinder';
 import { getSimulator } from '../arb/simulator';
 import { getStrategy } from '../arb/strategy';
-import { getExecutor } from '../exec/executor';
-import { getRiskManager } from '../risk/riskManager';
+import { RiskManager } from '../risk/riskManager';
 import { provider, getWebSocketProvider } from '../providers/polygonProvider';
 import { toWei, fromWei } from '../utils/math';
 import winston from 'winston';
@@ -16,9 +15,7 @@ const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: { service: 'market-watcher' },
   transports: [
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    }),
+    new winston.transports.Console({ format: winston.format.simple() }),
   ],
 });
 
@@ -55,18 +52,12 @@ export class MarketWatcher extends EventEmitter {
   constructor(dataSource: DataSource) {
     super();
     this.dataSource = dataSource;
-
-    this.blockQueue = new PQueue({
-      concurrency: 1,
-      timeout: 30000,
-    });
-
+    this.blockQueue = new PQueue({ concurrency: 1, timeout: 30000 });
     this.setupEventListeners();
   }
 
   private setupEventListeners(): void {
-    const riskManager = getRiskManager();
-
+    const riskManager = new RiskManager();
     riskManager.on('circuit-breaker-triggered', (reason: string) => {
       logger.error(`Circuit breaker triggered: ${reason}`);
       this.pause();
@@ -210,7 +201,7 @@ export class MarketWatcher extends EventEmitter {
       );
 
       // Filter out failed simulations
-      const validSimulations = simulations.filter(s => s !== null && s.isProfitable);
+      const validSimulations = simulations.filter((s): s is any => s !== null && s.isProfitable);
 
       if (validSimulations.length === 0) {
         return [];
@@ -238,8 +229,8 @@ export class MarketWatcher extends EventEmitter {
       return { executed: 0, totalProfit: 0 };
     }
 
-    const executor = getExecutor();
-    const riskManager = getRiskManager();
+    const executor = getStrategy();
+    const riskManager = new RiskManager();
     const strategy = getStrategy();
 
     let executed = 0;
@@ -289,7 +280,6 @@ export class MarketWatcher extends EventEmitter {
   }
 
   private async analyzePendingTransaction(txHash: string): Promise<void> {
-    // Ensure property exists in config
     if (!Config.features.enableSandwichProtection) {
       return;
     }
