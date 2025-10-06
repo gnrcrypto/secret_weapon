@@ -14,7 +14,7 @@ const typeorm_1 = require("typeorm");
 let TradeEntity = class TradeEntity {
     id;
     // Path information
-    pathType;
+    pathType; // Added 'flash-arb'
     tokens;
     dexes;
     inputAmount;

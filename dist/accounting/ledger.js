@@ -32,9 +32,6 @@ class Ledger {
         this.tokenRepo = dataSource.getRepository(token_entity_1.TokenEntity);
         this.dexRepo = dataSource.getRepository(dex_entity_1.DexEntity);
     }
-    /**
-     * Record a trade execution
-     */
     async recordTrade(simulation, execution, walletAddress) {
         const trade = new trade_entity_1.TradeEntity();
         trade.pathType = simulation.path.type;
@@ -63,9 +60,6 @@ class Ledger {
         logger.info(`Trade recorded: ${savedTrade.id} - Profit: $${trade.netProfitUsd}`);
         return savedTrade;
     }
-    /**
-     * Update wallet statistics
-     */
     async updateWalletStats(address, trade) {
         let wallet = await this.walletRepo.findOne({ where: { address } });
         if (!wallet) {
@@ -92,31 +86,24 @@ class Ledger {
         }
         await this.walletRepo.save(wallet);
     }
-    /**
-     * Update token statistics
-     */
     async updateTokenStats(address, trade) {
         let token = await this.tokenRepo.findOne({ where: { address } });
         if (!token) {
-            // Create new token entry
             token = new token_entity_1.TokenEntity();
             token.address = address;
             token.symbol = trade.tokens[0];
             token.name = trade.tokens[0];
-            token.decimals = 18; // Default, should be fetched
+            token.decimals = 18;
             token.totalTradeVolume = 0;
             token.totalProfitGenerated = 0;
         }
-        const tradeVolume = parseFloat(trade.inputAmount) / 1e18; // Simplified
+        const tradeVolume = parseFloat(trade.inputAmount) / 1e18;
         token.totalTradeVolume += tradeVolume;
         if (trade.isSuccessful && trade.netProfitUsd > 0) {
             token.totalProfitGenerated += trade.netProfitUsd;
         }
         await this.tokenRepo.save(token);
     }
-    /**
-     * Update DEX statistics
-     */
     async updateDexStats(dexName, trade) {
         let dex = await this.dexRepo.findOne({ where: { name: dexName } });
         if (!dex) {
@@ -134,14 +121,10 @@ class Ledger {
         if (trade.isSuccessful && trade.netProfitUsd > 0) {
             dex.totalProfitGenerated += trade.netProfitUsd;
         }
-        // Update average price impact
         dex.averagePriceImpact =
             (dex.averagePriceImpact * (dex.totalTrades - 1) + trade.priceImpact) / dex.totalTrades;
         await this.dexRepo.save(dex);
     }
-    /**
-     * Get P&L for a period
-     */
     async getPnL(startDate, endDate, walletAddress) {
         const query = this.tradeRepo
             .createQueryBuilder('trade')
@@ -165,9 +148,6 @@ class Ledger {
             successRate: trades.length > 0 ? (successfulTrades / trades.length) * 100 : 0,
         };
     }
-    /**
-     * Get top performing tokens
-     */
     async getTopTokens(limit = 10) {
         return this.tokenRepo
             .createQueryBuilder('token')
@@ -175,9 +155,6 @@ class Ledger {
             .limit(limit)
             .getMany();
     }
-    /**
-     * Get top performing DEXes
-     */
     async getTopDexes(limit = 5) {
         return this.dexRepo
             .createQueryBuilder('dex')
@@ -185,9 +162,6 @@ class Ledger {
             .limit(limit)
             .getMany();
     }
-    /**
-     * Get recent trades
-     */
     async getRecentTrades(limit = 20) {
         return this.tradeRepo
             .createQueryBuilder('trade')
@@ -195,9 +169,6 @@ class Ledger {
             .limit(limit)
             .getMany();
     }
-    /**
-     * Get wallet performance
-     */
     async getWalletPerformance(address) {
         return this.walletRepo.findOne({ where: { address } });
     }

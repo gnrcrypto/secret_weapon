@@ -16,10 +16,6 @@ export interface WatcherStatus {
     uptime: number;
     memoryUsage: NodeJS.MemoryUsage;
 }
-/**
- * Market Watcher Service
- * Continuously monitors blockchain for arbitrage opportunities
- */
 export declare class MarketWatcher extends EventEmitter {
     private isRunning;
     private startTime;
@@ -32,57 +28,18 @@ export declare class MarketWatcher extends EventEmitter {
     private wsProvider;
     private dataSource;
     constructor(dataSource: DataSource);
-    /**
-     * Setup internal event listeners
-     */
     private setupEventListeners;
-    /**
-     * Start watching for opportunities
-     */
     start(): Promise<void>;
-    /**
-     * Start WebSocket-based watching (real-time)
-     */
     private startWebSocketWatcher;
-    /**
-     * Start polling-based watching
-     */
     private startPollingWatcher;
-    /**
-     * Process a single block
-     */
     private processBlock;
-    /**
-     * Find arbitrage opportunities
-     */
     private findOpportunities;
-    /**
-     * Execute profitable opportunities
-     */
     private executeOpportunities;
-    /**
-     * Analyze pending transaction for MEV
-     */
     private analyzePendingTransaction;
-    /**
-     * Stop watching
-     */
     stop(): Promise<void>;
-    /**
-     * Pause watching (keeps connections alive)
-     */
     pause(): void;
-    /**
-     * Resume watching
-     */
     resume(): void;
-    /**
-     * Get watcher status
-     */
     getStatus(): WatcherStatus;
-    /**
-     * Get performance metrics
-     */
     getPerformanceMetrics(): object;
 }
 //# sourceMappingURL=watcher.d.ts.map

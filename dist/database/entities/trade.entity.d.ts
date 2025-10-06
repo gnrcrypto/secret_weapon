@@ -1,6 +1,6 @@
 export declare class TradeEntity {
     id: string;
-    pathType: 'triangular' | 'cross-dex';
+    pathType: 'triangular' | 'cross-dex' | 'flash-arb';
     tokens: string[];
     dexes: string[];
     inputAmount: string;

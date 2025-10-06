@@ -15,7 +15,6 @@ const math_1 = require("../utils/math");
 const winston_1 = __importDefault(require("winston"));
 const events_1 = require("events");
 const p_queue_1 = __importDefault(require("p-queue"));
-// Logger
 const logger = winston_1.default.createLogger({
     level: config_1.Config.monitoring.logLevel,
     format: winston_1.default.format.json(),
@@ -26,10 +25,6 @@ const logger = winston_1.default.createLogger({
         }),
     ],
 });
-/**
- * Market Watcher Service
- * Continuously monitors blockchain for arbitrage opportunities
- */
 class MarketWatcher extends events_1.EventEmitter {
     isRunning = false;
     startTime = Date.now();
@@ -44,18 +39,13 @@ class MarketWatcher extends events_1.EventEmitter {
     constructor(dataSource) {
         super();
         this.dataSource = dataSource;
-        // Initialize processing queue
         this.blockQueue = new p_queue_1.default({
-            concurrency: 1, // Process blocks sequentially
-            timeout: 30000, // 30 second timeout per block
+            concurrency: 1,
+            timeout: 30000,
         });
         this.setupEventListeners();
     }
-    /**
-     * Setup internal event listeners
-     */
     setupEventListeners() {
-        // Risk manager events
         const riskManager = (0, riskManager_1.getRiskManager)();
         riskManager.on('circuit-breaker-triggered', (reason) => {
             logger.error(`Circuit breaker triggered: ${reason}`);
@@ -65,9 +55,6 @@ class MarketWatcher extends events_1.EventEmitter {
             logger.warn(`Daily limit reached - ${limitType}: ${current}/${limit}`);
         });
     }
-    /**
-     * Start watching for opportunities
-     */
     async start() {
         if (this.isRunning) {
             logger.warn('Watcher already running');
@@ -76,27 +63,19 @@ class MarketWatcher extends events_1.EventEmitter {
         logger.info('Starting market watcher...');
         this.isRunning = true;
         this.startTime = Date.now();
-        // Initialize components
         const pathfinder = (0, pathfinder_1.getPathfinder)();
         await pathfinder.initialize();
-        // Get current block
         const currentProvider = polygonProvider_1.provider.get();
         this.lastBlockProcessed = await currentProvider.getBlockNumber();
-        // Start watching based on mode
         if (config_1.Config.features.enableMevProtection) {
-            // Use WebSocket for real-time monitoring
             await this.startWebSocketWatcher();
         }
         else {
-            // Use polling for standard monitoring
             this.startPollingWatcher();
         }
         logger.info(`Market watcher started at block ${this.lastBlockProcessed}`);
         this.emit('status-update', this.getStatus());
     }
-    /**
-     * Start WebSocket-based watching (real-time)
-     */
     async startWebSocketWatcher() {
         this.wsProvider = (0, polygonProvider_1.getWebSocketProvider)();
         if (!this.wsProvider) {
@@ -104,29 +83,22 @@ class MarketWatcher extends events_1.EventEmitter {
             this.startPollingWatcher();
             return;
         }
-        // Subscribe to new blocks
         this.wsProvider.on('block', async (blockNumber) => {
             await this.processBlock(blockNumber);
         });
-        // Subscribe to pending transactions for MEV
         if (config_1.Config.features.enableMevProtection) {
             this.wsProvider.on('pending', async (txHash) => {
-                // Analyze pending transactions for sandwich attacks
                 await this.analyzePendingTransaction(txHash);
             });
         }
         logger.info('WebSocket watcher initialized');
     }
-    /**
-     * Start polling-based watching
-     */
     startPollingWatcher() {
         const intervalMs = config_1.Config.monitoring.opportunityScanInterval || 30000;
         this.watchInterval = setInterval(async () => {
             try {
                 const currentProvider = polygonProvider_1.provider.get();
                 const currentBlock = await currentProvider.getBlockNumber();
-                // Process any missed blocks
                 while (this.lastBlockProcessed < currentBlock) {
                     this.lastBlockProcessed++;
                     await this.processBlock(this.lastBlockProcessed);
@@ -139,30 +111,21 @@ class MarketWatcher extends events_1.EventEmitter {
         }, intervalMs);
         logger.info(`Polling watcher initialized (interval: ${intervalMs}ms)`);
     }
-    /**
-     * Process a single block
-     */
     async processBlock(blockNumber) {
         const startTime = Date.now();
-        // Add to queue for sequential processing
         await this.blockQueue.add(async () => {
             try {
                 logger.debug(`Processing block ${blockNumber}`);
-                // Find arbitrage opportunities
                 const opportunities = await this.findOpportunities();
-                // Execute profitable opportunities
                 const results = await this.executeOpportunities(opportunities);
-                // Update metrics
                 this.lastBlockProcessed = blockNumber;
                 this.totalOpportunitiesFound += opportunities.length;
                 this.totalTradesExecuted += results.executed;
                 this.totalProfitGenerated += results.totalProfit;
-                // Emit events
                 this.emit('block-processed', blockNumber);
                 if (opportunities.length > 0) {
                     logger.info(`Block ${blockNumber}: Found ${opportunities.length} opportunities, executed ${results.executed}`);
                 }
-                // Log processing time if slow
                 const processingTime = Date.now() - startTime;
                 if (processingTime > 1000) {
                     logger.warn(`Slow block processing: ${processingTime}ms for block ${blockNumber}`);
@@ -174,28 +137,21 @@ class MarketWatcher extends events_1.EventEmitter {
             }
         });
     }
-    /**
-     * Find arbitrage opportunities
-     */
     async findOpportunities() {
         try {
             const pathfinder = (0, pathfinder_1.getPathfinder)();
             const simulator = (0, simulator_1.getSimulator)();
             const strategy = (0, strategy_1.getStrategy)();
-            // Find all possible paths
             const paths = await pathfinder.enumeratePaths();
             if (paths.length === 0) {
                 return [];
             }
             logger.debug(`Found ${paths.length} potential paths`);
-            // Simulate each path in parallel
             const simulations = await Promise.all(paths.map(async (path) => {
                 try {
-                    // Determine input amount based on path type
                     const inputAmount = path.type === 'triangular'
-                        ? (0, math_1.toWei)('1000', 18) // $1000 worth for triangular
-                        : (0, math_1.toWei)('5000', 18); // $5000 for cross-DEX
-                    // Simulate with current gas prices
+                        ? (0, math_1.toWei)('1000', 18)
+                        : (0, math_1.toWei)('5000', 18);
                     return await simulator.simulatePathOnChain(path, inputAmount);
                 }
                 catch (error) {
@@ -208,9 +164,7 @@ class MarketWatcher extends events_1.EventEmitter {
             if (validSimulations.length === 0) {
                 return [];
             }
-            // Select best opportunities
             const opportunities = await strategy.selectTopOpportunities(validSimulations);
-            // Log opportunities found
             opportunities.forEach(opp => {
                 logger.info(`Opportunity found: ${opp.simulation.path.id} - Profit: ${opp.simulation.netProfitUsd.toFixed(2)} - Risk: ${opp.riskLevel}`);
                 this.emit('opportunity-found', opp);
@@ -222,9 +176,6 @@ class MarketWatcher extends events_1.EventEmitter {
             return [];
         }
     }
-    /**
-     * Execute profitable opportunities
-     */
     async executeOpportunities(opportunities) {
         if (opportunities.length === 0) {
             return { executed: 0, totalProfit: 0 };
@@ -236,29 +187,23 @@ class MarketWatcher extends events_1.EventEmitter {
         let totalProfit = 0;
         for (const opportunity of opportunities) {
             try {
-                // Risk check
                 const riskCheck = await riskManager.checkRisk(opportunity);
                 if (!riskCheck.allowed) {
                     logger.warn(`Risk check failed: ${riskCheck.reasons.join(', ')}`);
                     continue;
                 }
-                // Final strategy check
                 if (!strategy.shouldExecute(opportunity)) {
                     logger.warn('Strategy rejected execution');
                     continue;
                 }
-                // Register trade with strategy
                 strategy.registerTradeExecution(opportunity.simulation.path.id);
-                // Execute trade
                 logger.info(`Executing trade: ${opportunity.simulation.path.id}`);
                 const result = await executor.executeAtomicSwap(opportunity);
-                // Update risk metrics
                 await riskManager.updatePostTrade(result, opportunity);
-                // Unregister from strategy
                 strategy.unregisterTrade(opportunity.simulation.path.id);
                 if (result.success) {
                     executed++;
-                    const profitUsd = parseFloat((0, math_1.fromWei)(result.actualProfit || BigInt(0))) * 0.8; // Estimate USD value
+                    const profitUsd = parseFloat((0, math_1.fromWei)(result.actualProfit || BigInt(0))) * 0.8;
                     totalProfit += profitUsd;
                     logger.info(`Trade executed successfully: ${result.transactionHash} - Profit: ${profitUsd.toFixed(2)}`);
                     this.emit('trade-executed', result);
@@ -274,10 +219,8 @@ class MarketWatcher extends events_1.EventEmitter {
         }
         return { executed, totalProfit };
     }
-    /**
-     * Analyze pending transaction for MEV
-     */
     async analyzePendingTransaction(txHash) {
+        // Ensure property exists in config
         if (!config_1.Config.features.enableSandwichProtection) {
             return;
         }
@@ -286,28 +229,18 @@ class MarketWatcher extends events_1.EventEmitter {
             const tx = await currentProvider.getTransaction(txHash);
             if (!tx || !tx.data)
                 return;
-            // Check if it's a DEX swap
-            const isSwap = tx.data.includes('0x38ed1739') || // swapExactTokensForTokens
-                tx.data.includes('0x8803dbee') || // swapTokensForExactTokens
-                tx.data.includes('0x7ff36ab5'); // swapExactETHForTokens
+            const isSwap = tx.data.includes('0x38ed1739') ||
+                tx.data.includes('0x8803dbee') ||
+                tx.data.includes('0x7ff36ab5');
             if (isSwap && tx.value && tx.value > (0, math_1.toWei)('100', 18)) {
-                // Large swap detected - potential sandwich opportunity
                 logger.debug(`Large swap detected in mempool: ${txHash}`);
                 // TODO: Implement sandwich protection strategy
-                // This could involve:
-                // 1. Frontrunning the transaction with our own trade
-                // 2. Backrunning it to capture the price movement
-                // 3. Or avoiding the affected pools temporarily
             }
         }
         catch (error) {
-            // Transaction might already be mined
             logger.debug(`Failed to analyze pending tx ${txHash}:`, error);
         }
     }
-    /**
-     * Stop watching
-     */
     async stop() {
         if (!this.isRunning) {
             logger.warn('Watcher not running');
@@ -315,25 +248,19 @@ class MarketWatcher extends events_1.EventEmitter {
         }
         logger.info('Stopping market watcher...');
         this.isRunning = false;
-        // Stop polling
         if (this.watchInterval) {
             clearInterval(this.watchInterval);
             this.watchInterval = null;
         }
-        // Disconnect WebSocket
         if (this.wsProvider) {
             this.wsProvider.removeAllListeners();
             await this.wsProvider.destroy();
             this.wsProvider = null;
         }
-        // Wait for queue to finish
         await this.blockQueue.onIdle();
         logger.info('Market watcher stopped');
         this.emit('status-update', this.getStatus());
     }
-    /**
-     * Pause watching (keeps connections alive)
-     */
     pause() {
         if (!this.isRunning)
             return;
@@ -348,9 +275,6 @@ class MarketWatcher extends events_1.EventEmitter {
         }
         this.blockQueue.pause();
     }
-    /**
-     * Resume watching
-     */
     resume() {
         if (!this.isRunning) {
             logger.warn('Watcher not running, cannot resume');
@@ -365,9 +289,6 @@ class MarketWatcher extends events_1.EventEmitter {
             this.startPollingWatcher();
         }
     }
-    /**
-     * Get watcher status
-     */
     getStatus() {
         return {
             isRunning: this.isRunning,
@@ -379,9 +300,6 @@ class MarketWatcher extends events_1.EventEmitter {
             memoryUsage: process.memoryUsage(),
         };
     }
-    /**
-     * Get performance metrics
-     */
     getPerformanceMetrics() {
         const uptime = Date.now() - this.startTime;
         const avgOpportunitiesPerHour = (this.totalOpportunitiesFound / (uptime / 3600000));

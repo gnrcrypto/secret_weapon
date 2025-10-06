@@ -6,55 +6,55 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Index(['netProfitUsd'])
 export class TradeEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   // Path information
   @Column({ type: 'varchar', length: 20 })
-  pathType: 'triangular' | 'cross-dex';
+  pathType!: 'triangular' | 'cross-dex' | 'flash-arb'; // Added 'flash-arb'
 
   @Column({ type: 'simple-array' })
-  tokens: string[];
+  tokens!: string[];
 
   @Column({ type: 'simple-array' })
-  dexes: string[];
+  dexes!: string[];
 
   @Column({ type: 'decimal', precision: 36, scale: 18 })
-  inputAmount: string;
+  inputAmount!: string;
 
   @Column({ type: 'decimal', precision: 36, scale: 18 })
-  outputAmount: string;
+  outputAmount!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  netProfitUsd: number;
+  netProfitUsd!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
-  priceImpact: number;
+  priceImpact!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
-  slippage: number;
+  slippage!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
-  confidence: number;
+  confidence!: number;
 
   @Column({ type: 'boolean', default: false })
-  isSuccessful: boolean;
+  isSuccessful!: boolean;
 
   // Transaction details
   @Column({ type: 'varchar', length: 66, nullable: true })
-  transactionHash: string;
+  transactionHash!: string;
 
   @Column({ type: 'bigint', nullable: true })
-  blockNumber: string;
+  blockNumber!: string;
 
   @Column({ type: 'decimal', precision: 36, scale: 18, nullable: true })
-  gasUsed: string;
+  gasUsed!: string;
 
   @Column({ type: 'decimal', precision: 36, scale: 18, nullable: true })
-  gasPrice: string;
+  gasPrice!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

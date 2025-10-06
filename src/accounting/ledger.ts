@@ -19,30 +19,25 @@ const logger = winston.createLogger({
 });
 
 export class Ledger {
-  private dataSource: DataSource;
   private tradeRepo: Repository<TradeEntity>;
   private walletRepo: Repository<WalletEntity>;
   private tokenRepo: Repository<TokenEntity>;
   private dexRepo: Repository<DexEntity>;
 
-  constructor(dataSource: DataSource) {
-    this.dataSource = dataSource;
+  constructor(private dataSource: DataSource) {
     this.tradeRepo = dataSource.getRepository(TradeEntity);
     this.walletRepo = dataSource.getRepository(WalletEntity);
     this.tokenRepo = dataSource.getRepository(TokenEntity);
     this.dexRepo = dataSource.getRepository(DexEntity);
   }
 
-  /**
-   * Record a trade execution
-   */
   async recordTrade(
     simulation: SimulationResult,
     execution: ExecutionResult,
     walletAddress: string
   ): Promise<TradeEntity> {
     const trade = new TradeEntity();
-    
+
     trade.pathType = simulation.path.type;
     trade.tokens = simulation.path.tokens.map(t => t.symbol);
     trade.dexes = simulation.path.dexes;
@@ -53,38 +48,32 @@ export class Ledger {
     trade.slippage = simulation.slippage;
     trade.confidence = simulation.confidence;
     trade.isSuccessful = execution.success;
-    
+
     if (execution.transactionHash) {
       trade.transactionHash = execution.transactionHash;
     }
-    
+
     if (execution.receipt) {
       trade.blockNumber = execution.receipt.blockNumber.toString();
       trade.gasUsed = execution.gasUsed?.toString() || '0';
       trade.gasPrice = execution.effectiveGasPrice?.toString() || '0';
     }
-    
+
     const savedTrade = await this.tradeRepo.save(trade);
-    
+
     // Update related stats
     await this.updateWalletStats(walletAddress, trade);
     await this.updateTokenStats(simulation.path.tokens[0].address, trade);
     await this.updateDexStats(simulation.path.dexes[0], trade);
-    
+
     logger.info(`Trade recorded: ${savedTrade.id} - Profit: $${trade.netProfitUsd}`);
-    
+
     return savedTrade;
   }
 
-  /**
-   * Update wallet statistics
-   */
-  private async updateWalletStats(
-    address: string,
-    trade: TradeEntity
-  ): Promise<void> {
+  private async updateWalletStats(address: string, trade: TradeEntity): Promise<void> {
     let wallet = await this.walletRepo.findOne({ where: { address } });
-    
+
     if (!wallet) {
       wallet = new WalletEntity();
       wallet.address = address;
@@ -94,9 +83,9 @@ export class Ledger {
       wallet.successfulTrades = 0;
       wallet.tokenBalances = {};
     }
-    
+
     wallet.totalTrades++;
-    
+
     if (trade.isSuccessful) {
       wallet.successfulTrades++;
       if (trade.netProfitUsd > 0) {
@@ -107,49 +96,36 @@ export class Ledger {
     } else {
       wallet.totalLossUsd += Math.abs(trade.netProfitUsd);
     }
-    
+
     await this.walletRepo.save(wallet);
   }
 
-  /**
-   * Update token statistics
-   */
-  private async updateTokenStats(
-    address: string,
-    trade: TradeEntity
-  ): Promise<void> {
+  private async updateTokenStats(address: string, trade: TradeEntity): Promise<void> {
     let token = await this.tokenRepo.findOne({ where: { address } });
-    
+
     if (!token) {
-      // Create new token entry
       token = new TokenEntity();
       token.address = address;
       token.symbol = trade.tokens[0];
       token.name = trade.tokens[0];
-      token.decimals = 18; // Default, should be fetched
+      token.decimals = 18;
       token.totalTradeVolume = 0;
       token.totalProfitGenerated = 0;
     }
-    
-    const tradeVolume = parseFloat(trade.inputAmount) / 1e18; // Simplified
+
+    const tradeVolume = parseFloat(trade.inputAmount) / 1e18;
     token.totalTradeVolume += tradeVolume;
-    
+
     if (trade.isSuccessful && trade.netProfitUsd > 0) {
       token.totalProfitGenerated += trade.netProfitUsd;
     }
-    
+
     await this.tokenRepo.save(token);
   }
 
-  /**
-   * Update DEX statistics
-   */
-  private async updateDexStats(
-    dexName: string,
-    trade: TradeEntity
-  ): Promise<void> {
+  private async updateDexStats(dexName: string, trade: TradeEntity): Promise<void> {
     let dex = await this.dexRepo.findOne({ where: { name: dexName } });
-    
+
     if (!dex) {
       dex = new DexEntity();
       dex.name = dexName;
@@ -159,25 +135,21 @@ export class Ledger {
       dex.totalTrades = 0;
       dex.averagePriceImpact = 0;
     }
-    
+
     dex.totalTrades++;
     const tradeVolume = parseFloat(trade.inputAmount) / 1e18;
     dex.totalTradeVolume += tradeVolume;
-    
+
     if (trade.isSuccessful && trade.netProfitUsd > 0) {
       dex.totalProfitGenerated += trade.netProfitUsd;
     }
-    
-    // Update average price impact
-    dex.averagePriceImpact = 
+
+    dex.averagePriceImpact =
       (dex.averagePriceImpact * (dex.totalTrades - 1) + trade.priceImpact) / dex.totalTrades;
-    
+
     await this.dexRepo.save(dex);
   }
 
-  /**
-   * Get P&L for a period
-   */
   async getPnL(
     startDate: Date,
     endDate: Date,
@@ -195,19 +167,19 @@ export class Ledger {
         startDate,
         endDate,
       });
-    
+
     const trades = await query.getMany();
-    
+
     const totalProfit = trades
       .filter(t => t.isSuccessful && t.netProfitUsd > 0)
       .reduce((sum, t) => sum + t.netProfitUsd, 0);
-    
+
     const totalLoss = trades
       .filter(t => !t.isSuccessful || t.netProfitUsd < 0)
       .reduce((sum, t) => sum + Math.abs(t.netProfitUsd), 0);
-    
+
     const successfulTrades = trades.filter(t => t.isSuccessful).length;
-    
+
     return {
       totalProfit,
       totalLoss,
@@ -217,9 +189,6 @@ export class Ledger {
     };
   }
 
-  /**
-   * Get top performing tokens
-   */
   async getTopTokens(limit: number = 10): Promise<TokenEntity[]> {
     return this.tokenRepo
       .createQueryBuilder('token')
@@ -228,9 +197,6 @@ export class Ledger {
       .getMany();
   }
 
-  /**
-   * Get top performing DEXes
-   */
   async getTopDexes(limit: number = 5): Promise<DexEntity[]> {
     return this.dexRepo
       .createQueryBuilder('dex')
@@ -239,9 +205,6 @@ export class Ledger {
       .getMany();
   }
 
-  /**
-   * Get recent trades
-   */
   async getRecentTrades(limit: number = 20): Promise<TradeEntity[]> {
     return this.tradeRepo
       .createQueryBuilder('trade')
@@ -250,9 +213,6 @@ export class Ledger {
       .getMany();
   }
 
-  /**
-   * Get wallet performance
-   */
   async getWalletPerformance(address: string): Promise<WalletEntity | null> {
     return this.walletRepo.findOne({ where: { address } });
   }
