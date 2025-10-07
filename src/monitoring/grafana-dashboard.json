@@ -1,0 +1,210 @@
+{
+  "dashboard": {
+    "title": "Polygon Arbitrage Bot Dashboard",
+    "panels": [
+      {
+        "title": "Total Profit (USD)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "arb_profit_usd_total",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 100}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Success Rate",
+        "type": "gauge",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(arb_trades_successful_total[5m]) / rate(arb_trades_executed_total[5m]) * 100",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Circuit Breaker Status",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "arb_circuit_breaker_status",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"type": "value", "value": "0", "text": "🟢 INACTIVE"},
+              {"type": "value", "value": "1", "text": "🔴 ACTIVE"}
+            ]
+          }
+        }
+      },
+      {
+        "title": "Daily Trades",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "increase(arb_trades_executed_total[24h])",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Opportunities Found vs Executed",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "targets": [
+          {
+            "expr": "rate(arb_opportunities_found_total[5m])",
+            "legendFormat": "Found",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(arb_trades_executed_total[5m])",
+            "legendFormat": "Executed",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "Profit by Token",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "expr": "arb_profit_usd_total",
+            "legendFormat": "{{token}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Gas Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+        "targets": [
+          {
+            "expr": "rate(arb_gas_spent_wei_total[5m])",
+            "legendFormat": "Gas (Wei/s)",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Price Impact Distribution",
+        "type": "heatmap",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, rate(arb_price_impact_percent_bucket[5m]))",
+            "legendFormat": "{{dex}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Risk Score",
+        "type": "gauge",
+        "gridPos": {"h": 6, "w": 6, "x": 0, "y": 20},
+        "targets": [
+          {
+            "expr": "arb_risk_score",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "red", "value": 75}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Wallet Balances",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 6, "x": 6, "y": 20},
+        "targets": [
+          {
+            "expr": "arb_wallet_balance",
+            "format": "table",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Token Prices (USD)",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 6, "x": 12, "y": 20},
+        "targets": [
+          {
+            "expr": "arb_token_price_usd",
+            "format": "table",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "System Resources",
+        "type": "graph",
+        "gridPos": {"h": 6, "w": 6, "x": 18, "y": 20},
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes",
+            "legendFormat": "Memory",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(process_cpu_seconds_total[1m])",
+            "legendFormat": "CPU",
+            "refId": "B"
+          }
+        ]
+      }
+    ],
+    "refresh": "10s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}
