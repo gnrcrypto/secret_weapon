@@ -55,35 +55,56 @@ const logger = winston_1.default.createLogger({
         }),
     ],
 });
+// Shorter TTL for live trading
 const priceCache = new node_cache_1.default({
-    stdTTL: config_1.Config.performance.priceCacheTtlMs / 1000,
-    checkperiod: 60,
+    stdTTL: 5, // 5 seconds for live prices
+    checkperiod: 2,
     useClones: false,
 });
+// Updated Chainlink Oracle configurations for Polygon
+// Verify these addresses at: https://docs.chain.link/data-feeds/price-feeds/addresses?network=polygon
 const CHAINLINK_ORACLES = {
     'MATIC/USD': {
-        address: abi_1.POLYGON_ADDRESSES.CHAINLINK_MATIC_USD,
+        address: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
         decimals: 8,
-        heartbeat: 120,
+        heartbeat: 27, // Polygon mainnet heartbeat for MATIC/USD
         description: 'MATIC / USD',
+        priority: 100,
     },
     'ETH/USD': {
-        address: abi_1.POLYGON_ADDRESSES.CHAINLINK_ETH_USD,
+        address: '0xF9680D99D6C9589e2a93a78A04A279e509205945',
         decimals: 8,
-        heartbeat: 120,
+        heartbeat: 27,
         description: 'ETH / USD',
+        priority: 100,
     },
     'BTC/USD': {
-        address: abi_1.POLYGON_ADDRESSES.CHAINLINK_BTC_USD,
+        address: '0xc907E116054Ad103354f2D350FD2514433D57F6f',
         decimals: 8,
-        heartbeat: 120,
+        heartbeat: 27,
         description: 'BTC / USD',
+        priority: 100,
     },
     'USDC/USD': {
-        address: abi_1.POLYGON_ADDRESSES.CHAINLINK_USDC_USD,
+        address: '0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7',
+        decimals: 8,
+        heartbeat: 86400, // 24 hours for stablecoins
+        description: 'USDC / USD',
+        priority: 90,
+    },
+    'USDT/USD': {
+        address: '0x0A6513e40db6EB1b165753AD52E80663aeA50545',
+        decimals: 8,
+        heartbeat: 86400,
+        description: 'USDT / USD',
+        priority: 90,
+    },
+    'DAI/USD': {
+        address: '0x4746DeC9e833A82EC7C2C1356372CcF2cfcD2F3D',
         decimals: 8,
         heartbeat: 3600,
-        description: 'USDC / USD',
+        description: 'DAI / USD',
+        priority: 90,
     },
 };
 const TOKEN_ADDRESSES = {
@@ -100,17 +121,50 @@ const TOKEN_ADDRESSES = {
 class PriceOracleAdapter {
     provider;
     chainlinkContracts = new Map();
+    priceUpdateListeners = new Map();
+    lastPrices = new Map();
     constructor(provider) {
         this.provider = provider;
         this.initializeOracles();
+        this.startPriceUpdates();
     }
     initializeOracles() {
         for (const [pair, config] of Object.entries(CHAINLINK_ORACLES)) {
-            const contract = new ethers_1.Contract(config.address, abi_1.CHAINLINK_ORACLE_ABI, this.provider);
-            this.chainlinkContracts.set(pair, contract);
+            try {
+                const contract = new ethers_1.Contract(config.address, abi_1.CHAINLINK_ORACLE_ABI, this.provider);
+                this.chainlinkContracts.set(pair, contract);
+                logger.info(`Initialized Chainlink oracle: ${pair} at ${config.address}`);
+            }
+            catch (error) {
+                logger.error(`Failed to initialize oracle for ${pair}:`, error);
+            }
         }
         logger.info(`Initialized ${this.chainlinkContracts.size} Chainlink oracles`);
     }
+    /**
+     * Start background price updates for critical pairs
+     */
+    startPriceUpdates() {
+        const criticalPairs = ['MATIC/USD', 'ETH/USD', 'BTC/USD'];
+        criticalPairs.forEach(pair => {
+            // Initial fetch
+            this.getChainlinkPrice(pair).catch(err => logger.error(`Initial price fetch failed for ${pair}:`, err));
+            // Set up periodic updates every 5 seconds
+            const timer = setInterval(async () => {
+                try {
+                    await this.getChainlinkPrice(pair);
+                }
+                catch (error) {
+                    logger.error(`Background price update failed for ${pair}:`, error);
+                }
+            }, 5000);
+            this.priceUpdateListeners.set(pair, timer);
+        });
+        logger.info('Started background price updates for critical pairs');
+    }
+    /**
+     * Get Chainlink price with improved error handling and staleness checks
+     */
     async getChainlinkPrice(pair) {
         const cacheKey = `chainlink:${pair}`;
         const cached = priceCache.get(cacheKey);
@@ -124,26 +178,54 @@ class PriceOracleAdapter {
         }
         try {
             const roundData = await contract.latestRoundData();
-            const price = Number(roundData.price) / Math.pow(10, config.decimals);
+            const price = Number(roundData.answer) / Math.pow(10, config.decimals);
             const updatedAt = Number(roundData.updatedAt);
             const currentTime = Math.floor(Date.now() / 1000);
-            if (currentTime - updatedAt > config.heartbeat) {
-                logger.warn(`Chainlink price for ${pair} is stale (${currentTime - updatedAt}s old)`);
+            const roundId = roundData.roundId.toString();
+            // Check if price is stale
+            const age = currentTime - updatedAt;
+            if (age > config.heartbeat) {
+                logger.warn(`Chainlink price for ${pair} is stale (${age}s old, heartbeat: ${config.heartbeat}s)`);
+                // For critical pairs, try to use last known good price
+                if (age > config.heartbeat * 5) { // If >5x heartbeat
+                    logger.error(`Chainlink price for ${pair} is severely stale, falling back to DEX`);
+                    return null;
+                }
+            }
+            // Sanity check the price
+            if (price <= 0 || !isFinite(price)) {
+                logger.error(`Invalid Chainlink price for ${pair}: ${price}`);
+                return null;
             }
             const priceData = {
                 price,
                 timestamp: updatedAt * 1000,
                 source: 'chainlink',
-                confidence: currentTime - updatedAt <= config.heartbeat ? 1 : 0.5,
+                confidence: age <= config.heartbeat ? 1 : Math.max(0.5, 1 - (age / config.heartbeat) / 5),
+                roundId,
             };
             priceCache.set(cacheKey, priceData);
+            this.lastPrices.set(pair, priceData);
+            logger.debug(`Chainlink price for ${pair}: $${price.toFixed(4)} (age: ${age}s, round: ${roundId})`);
             return priceData;
         }
         catch (error) {
             logger.error(`Failed to get Chainlink price for ${pair}:`, error);
+            // Return last known good price if available
+            const lastPrice = this.lastPrices.get(pair);
+            if (lastPrice) {
+                const age = Date.now() - lastPrice.timestamp;
+                if (age < 60000) { // Less than 1 minute old
+                    logger.info(`Using last known price for ${pair} (${age}ms old)`);
+                    return { ...lastPrice, confidence: 0.7 };
+                }
+            }
             return null;
         }
     }
+    /**
+     * Get DEX price with improved routing
+     */
     async getDexPrice(tokenA, tokenB) {
         const cacheKey = `dex:${tokenA}:${tokenB}`;
         const cached = priceCache.get(cacheKey);
@@ -154,16 +236,19 @@ class PriceOracleAdapter {
             const router = getMultiDexRouter();
             const tokenAInfo = await router.getTokenInfo(tokenA);
             const oneToken = BigInt(10) ** BigInt(tokenAInfo.decimals);
+            // Get quotes from all available DEXs
             const quote = await router.getBestQuote(tokenA, tokenB, oneToken);
             if (!quote)
                 return null;
             const tokenBInfo = await router.getTokenInfo(tokenB);
             const outputAmount = parseFloat((0, math_1.fromWei)(quote.amountOut, tokenBInfo.decimals));
+            // Confidence based on liquidity and price impact
+            const confidence = Math.max(0.5, Math.min(0.9, 1 - (quote.priceImpact / 10)));
             const priceData = {
                 price: outputAmount,
                 timestamp: Date.now(),
                 source: 'dex',
-                confidence: 0.8,
+                confidence,
             };
             priceCache.set(cacheKey, priceData);
             return priceData;
@@ -173,33 +258,45 @@ class PriceOracleAdapter {
             return null;
         }
     }
+    /**
+     * Get live token price in USD with best available source
+     */
     async getTokenPriceUSD(tokenSymbolOrAddress) {
         const tokenAddress = TOKEN_ADDRESSES[tokenSymbolOrAddress.toUpperCase()] || tokenSymbolOrAddress;
+        // Stablecoins always return 1.0
         if (this.isStablecoin(tokenAddress)) {
             return 1.0;
         }
+        // Try Chainlink first (most reliable)
         const chainlinkPair = this.getChainlinkPair(tokenAddress);
         if (chainlinkPair) {
             const chainlinkPrice = await this.getChainlinkPrice(chainlinkPair);
-            if (chainlinkPrice && chainlinkPrice.confidence && chainlinkPrice.confidence > 0.5) {
+            if (chainlinkPrice && chainlinkPrice.confidence && chainlinkPrice.confidence > 0.7) {
                 return chainlinkPrice.price;
             }
         }
+        // Fallback to DEX prices against USDC
         const usdcAddress = config_1.ADDRESSES.USDC;
         const dexPrice = await this.getDexPrice(tokenAddress, usdcAddress);
-        if (dexPrice) {
+        if (dexPrice && dexPrice.confidence && dexPrice.confidence > 0.5) {
             return dexPrice.price;
         }
+        // Last resort: triangular pricing through MATIC
         const maticPrice = await this.getChainlinkPrice('MATIC/USD');
-        if (maticPrice) {
+        if (maticPrice && maticPrice.confidence && maticPrice.confidence > 0.7) {
             const tokenToMatic = await this.getDexPrice(tokenAddress, config_1.ADDRESSES.WMATIC);
             if (tokenToMatic) {
-                return tokenToMatic.price * maticPrice.price;
+                const usdPrice = tokenToMatic.price * maticPrice.price;
+                logger.info(`Calculated ${tokenSymbolOrAddress} price via MATIC: $${usdPrice.toFixed(4)}`);
+                return usdPrice;
             }
         }
         logger.warn(`Could not determine USD price for ${tokenSymbolOrAddress}`);
         return null;
     }
+    /**
+     * Get real-time price with source preference
+     */
     async getPrice(tokenA, tokenB) {
         const cacheKey = `pair:${tokenA}:${tokenB}`;
         const cached = priceCache.get(cacheKey);
@@ -209,11 +306,13 @@ class PriceOracleAdapter {
         const addressB = TOKEN_ADDRESSES[tokenB.toUpperCase()] || tokenB;
         const sources = [];
         let price = null;
+        // Try DEX price first for token pairs (more real-time)
         const dexPrice = await this.getDexPrice(addressA, addressB);
         if (dexPrice) {
             price = dexPrice.price;
             sources.push('dex');
         }
+        // Fallback to derived USD prices
         if (!price) {
             const [priceAUSD, priceBUSD] = await Promise.all([
                 this.getTokenPriceUSD(addressA),
@@ -284,45 +383,57 @@ class PriceOracleAdapter {
     }
     async getAggregatedPrice(tokenA, tokenB) {
         const prices = [];
-        const sources = [];
+        // Chainlink price (highest weight)
         const chainlinkPair = this.getChainlinkPairForTokens(tokenA, tokenB);
         if (chainlinkPair) {
             const chainlinkPrice = await this.getChainlinkPrice(chainlinkPair);
-            if (chainlinkPrice && chainlinkPrice.confidence && chainlinkPrice.confidence > 0.5) {
-                prices.push(chainlinkPrice.price);
-                sources.push('chainlink');
+            if (chainlinkPrice && chainlinkPrice.confidence && chainlinkPrice.confidence > 0.7) {
+                prices.push({
+                    price: chainlinkPrice.price,
+                    weight: 3,
+                    source: 'chainlink'
+                });
             }
         }
+        // DEX price (medium weight)
         const dexPrice = await this.getDexPrice(tokenA, tokenB);
-        if (dexPrice) {
-            prices.push(dexPrice.price);
-            sources.push('dex');
+        if (dexPrice && dexPrice.confidence && dexPrice.confidence > 0.5) {
+            prices.push({
+                price: dexPrice.price,
+                weight: 2,
+                source: 'dex'
+            });
         }
+        // USD derived price (lower weight)
         if (prices.length === 0) {
             const [priceAUSD, priceBUSD] = await Promise.all([
                 this.getTokenPriceUSD(tokenA),
                 this.getTokenPriceUSD(tokenB),
             ]);
             if (priceAUSD && priceBUSD) {
-                prices.push(priceAUSD / priceBUSD);
-                sources.push('usd-derived');
+                prices.push({
+                    price: priceAUSD / priceBUSD,
+                    weight: 1,
+                    source: 'usd-derived'
+                });
             }
         }
         if (prices.length === 0) {
             throw new Error(`No price sources available for ${tokenA}/${tokenB}`);
         }
-        let totalWeight = 0;
-        let weightedSum = 0;
-        prices.forEach((price, index) => {
-            const weight = sources[index] === 'chainlink' ? 2 : 1;
-            weightedSum += price * weight;
-            totalWeight += weight;
-        });
+        // Weighted average
+        const totalWeight = prices.reduce((sum, p) => sum + p.weight, 0);
+        const weightedSum = prices.reduce((sum, p) => sum + (p.price * p.weight), 0);
+        const finalPrice = weightedSum / totalWeight;
+        // Calculate confidence based on number of sources and agreement
+        const maxDeviation = Math.max(...prices.map(p => Math.abs(p.price - finalPrice) / finalPrice));
+        const confidence = Math.max(0.5, Math.min(1, (1 - maxDeviation) * (prices.length / 3)));
+        logger.debug(`Aggregated price for ${tokenA}/${tokenB}: $${finalPrice.toFixed(6)} from ${prices.length} sources`);
         return {
-            price: weightedSum / totalWeight,
+            price: finalPrice,
             timestamp: Date.now(),
             source: 'aggregated',
-            confidence: Math.min(1, prices.length / 2),
+            confidence,
         };
     }
     async validatePrice(tokenA, tokenB, price, tolerancePercent = 5) {
@@ -358,22 +469,55 @@ class PriceOracleAdapter {
             return 'BTC/USD';
         if (addressLower === config_1.ADDRESSES.USDC.toLowerCase())
             return 'USDC/USD';
+        if (addressLower === config_1.ADDRESSES.USDT.toLowerCase())
+            return 'USDT/USD';
+        if (addressLower === config_1.ADDRESSES.DAI.toLowerCase())
+            return 'DAI/USD';
         return null;
     }
     getChainlinkPairForTokens(tokenA, _tokenB) {
         return this.getChainlinkPair(tokenA);
+    }
+    /**
+     * Get health status of all oracles
+     */
+    getOracleHealth() {
+        const health = {};
+        for (const [pair, priceData] of this.lastPrices.entries()) {
+            const age = Date.now() - priceData.timestamp;
+            const config = CHAINLINK_ORACLES[pair];
+            health[pair] = {
+                price: priceData.price,
+                age: `${(age / 1000).toFixed(1)}s`,
+                confidence: priceData.confidence,
+                isHealthy: age < (config?.heartbeat || 60) * 1000,
+                roundId: priceData.roundId,
+            };
+        }
+        return health;
     }
     clearCache() {
         priceCache.flushAll();
         logger.info('Price cache cleared');
     }
     getCacheStats() {
+        const stats = priceCache.getStats();
         return {
             keys: priceCache.keys().length,
-            hits: priceCache.getStats().hits,
-            misses: priceCache.getStats().misses,
-            hitRate: (priceCache.getStats().hits / (priceCache.getStats().hits + priceCache.getStats().misses) * 100).toFixed(2) + '%',
+            hits: stats.hits,
+            misses: stats.misses,
+            hitRate: stats.hits > 0 ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2) + '%' : '0%',
         };
+    }
+    /**
+     * Cleanup background tasks
+     */
+    destroy() {
+        for (const [pair, timer] of this.priceUpdateListeners.entries()) {
+            clearInterval(timer);
+            logger.info(`Stopped price updates for ${pair}`);
+        }
+        this.priceUpdateListeners.clear();
     }
 }
 exports.PriceOracleAdapter = PriceOracleAdapter;
