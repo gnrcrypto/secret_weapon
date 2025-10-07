@@ -60,7 +60,6 @@ export declare class RiskManager extends EventEmitter {
     private tradeHistory;
     private circuitBreakerResetTimer;
     private dailyResetTimer;
-    private isInitialized;
     constructor();
     /**
      * Initialize risk metrics

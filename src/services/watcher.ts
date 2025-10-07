@@ -50,11 +50,10 @@ export class MarketWatcher extends EventEmitter {
   private blockQueue: PQueue;
   private watchInterval: NodeJS.Timeout | null = null;
   private wsProvider: any = null;
-  private dataSource: DataSource;
 
-  constructor(dataSource: DataSource) {
+  constructor(_dataSource: DataSource) {
     super();
-    this.dataSource = dataSource;
+    // _dataSource is accepted for API compatibility but not required by this implementation.
     this.blockQueue = new PQueue({ concurrency: 1, timeout: 30000 });
     this.setupEventListeners();
   }
@@ -63,14 +62,16 @@ export class MarketWatcher extends EventEmitter {
     const riskManager = getRiskManager();
 
     // RiskManager implements EventEmitter so .on is available
-    riskManager.on('circuit-breaker-triggered', (reason: string) => {
-      logger.error(`Circuit breaker triggered: ${reason}`);
-      this.pause();
-    });
+    if (riskManager && typeof (riskManager as any).on === 'function') {
+      (riskManager as any).on('circuit-breaker-triggered', (reason: string) => {
+        logger.error(`Circuit breaker triggered: ${reason}`);
+        this.pause();
+      });
 
-    riskManager.on('daily-limit-reached', (limitType: string, current: number, limit: number) => {
-      logger.warn(`Daily limit reached - ${limitType}: ${current}/${limit}`);
-    });
+      (riskManager as any).on('daily-limit-reached', (limitType: string, current: number, limit: number) => {
+        logger.warn(`Daily limit reached - ${limitType}: ${current}/${limit}`);
+      });
+    }
   }
 
   async start(): Promise<void> {

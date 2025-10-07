@@ -93,3 +93,305 @@
 {"level":"info","message":"Connected to Polygon network (chainId: 137)","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.220Z"}
 {"level":"info","message":"Initializing database connections...","service":"polygon-arbitrage-bot","timestamp":"2025-10-06T03:00:45.220Z"}
 {"level":"error","message":"Failed to start bot: Data type \"jsonb\" in \"WalletEntity.tokenBalances\" is not supported by \"sqlite\" database.","service":"polygon-arbitrage-bot","stack":"DataTypeNotSupportedError: Data type \"jsonb\" in \"WalletEntity.tokenBalances\" is not supported by \"sqlite\" database.\n    at /home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:133:31\n    at Array.forEach (<anonymous>)\n    at EntityMetadataValidator.validate (/home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:128:18)\n    at /home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:43:18\n    at Array.forEach (<anonymous>)\n    at EntityMetadataValidator.validateMany (/home/nickypoo/secret_weapon/node_modules/src/metadata-builder/EntityMetadataValidator.ts:42:25)\n    at DataSource.buildMetadatas (/home/nickypoo/secret_weapon/node_modules/src/data-source/DataSource.ts:753:33)\n    at async DataSource.initialize (/home/nickypoo/secret_weapon/node_modules/src/data-source/DataSource.ts:264:13)\n    at async ArbitrageBotApplication.initializeDatabase (/home/nickypoo/secret_weapon/src/index.ts:180:5)\n    at async ArbitrageBotApplication.initialize (/home/nickypoo/secret_weapon/src/index.ts:157:5)","timestamp":"2025-10-06T03:00:45.250Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:03:59.694Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:03:59.695Z"}
+{"level":"error","message":"❌ Initialization failed: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string","service":"main-orchestrator","stack":"Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n    at Object.continueSession (/home/nickypoo/secret_weapon/node_modules/pg/lib/crypto/sasl.js:36:11)\n    at Client._handleAuthSASLContinue (/home/nickypoo/secret_weapon/node_modules/pg/lib/client.js:276:18)\n    at Connection.emit (node:events:524:28)\n    at /home/nickypoo/secret_weapon/node_modules/pg/lib/connection.js:116:12\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:36:17)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)","timestamp":"2025-10-07T00:03:59.779Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:12:55.468Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:12:55.469Z"}
+{"level":"error","message":"❌ Initialization failed: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string","service":"main-orchestrator","stack":"Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n    at Object.continueSession (/home/nickypoo/secret_weapon/node_modules/pg/lib/crypto/sasl.js:36:11)\n    at Client._handleAuthSASLContinue (/home/nickypoo/secret_weapon/node_modules/pg/lib/client.js:276:18)\n    at Connection.emit (node:events:524:28)\n    at /home/nickypoo/secret_weapon/node_modules/pg/lib/connection.js:116:12\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:36:17)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)","timestamp":"2025-10-07T00:12:55.536Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:25:12.917Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:25:12.918Z"}
+{"code":"28P01","file":"auth.c","length":104,"level":"error","line":"329","message":"❌ Initialization failed: password authentication failed for user \"postgres\"","name":"error","routine":"auth_failed","service":"main-orchestrator","severity":"FATAL","stack":"error: password authentication failed for user \"postgres\"\n    at Parser.parseErrorMessage (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:285:98)\n    at Parser.handlePacket (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:122:29)\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:35:38)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:191:23)","timestamp":"2025-10-07T00:25:13.007Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:33:04.611Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:33:04.612Z"}
+{"code":"28P01","file":"auth.c","length":104,"level":"error","line":"329","message":"❌ Initialization failed: password authentication failed for user \"postgres\"","name":"error","routine":"auth_failed","service":"main-orchestrator","severity":"FATAL","stack":"error: password authentication failed for user \"postgres\"\n    at Parser.parseErrorMessage (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:285:98)\n    at Parser.handlePacket (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:122:29)\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:35:38)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:191:23)","timestamp":"2025-10-07T00:33:04.694Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:33:52.925Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:33:52.927Z"}
+{"code":"28P01","file":"auth.c","length":104,"level":"error","line":"329","message":"❌ Initialization failed: password authentication failed for user \"postgres\"","name":"error","routine":"auth_failed","service":"main-orchestrator","severity":"FATAL","stack":"error: password authentication failed for user \"postgres\"\n    at Parser.parseErrorMessage (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:285:98)\n    at Parser.handlePacket (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:122:29)\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:35:38)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:191:23)","timestamp":"2025-10-07T00:33:53.001Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:35:37.709Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:35:37.711Z"}
+{"code":"28P01","file":"auth.c","length":104,"level":"error","line":"329","message":"❌ Initialization failed: password authentication failed for user \"postgres\"","name":"error","routine":"auth_failed","service":"main-orchestrator","severity":"FATAL","stack":"error: password authentication failed for user \"postgres\"\n    at Parser.parseErrorMessage (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:285:98)\n    at Parser.handlePacket (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:122:29)\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:35:38)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:191:23)","timestamp":"2025-10-07T00:35:37.800Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:17.582Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:17.583Z"}
+{"code":"28P01","file":"auth.c","length":104,"level":"error","line":"329","message":"❌ Initialization failed: password authentication failed for user \"postgres\"","name":"error","routine":"auth_failed","service":"main-orchestrator","severity":"FATAL","stack":"error: password authentication failed for user \"postgres\"\n    at Parser.parseErrorMessage (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:285:98)\n    at Parser.handlePacket (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:122:29)\n    at Parser.parse (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/parser.js:35:38)\n    at Socket.<anonymous> (/home/nickypoo/secret_weapon/node_modules/pg-protocol/dist/index.js:11:42)\n    at Socket.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:191:23)","timestamp":"2025-10-07T00:37:17.658Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.165Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.166Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.292Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.292Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.293Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.293Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.293Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T00:37:31.748Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.010Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.012Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.132Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.132Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.133Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.133Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.134Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.570Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.571Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.571Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.571Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.573Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.573Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.580Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.581Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.584Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.584Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.585Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.586Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.586Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.586Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.586Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:46:06.586Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T00:46:17.982Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.217Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.218Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.334Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.335Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.335Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.335Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.336Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.718Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.718Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.719Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.719Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.720Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.720Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.727Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.729Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.731Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.731Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.731Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.731Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T00:51:07.732Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.688Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.688Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.688Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.688Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.688Z"}
+{"level":"info","message":"Time: 2025-10-07T00:51:26.689Z","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.689Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.689Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:51:26.689Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:52:26.691Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:52:26.692Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:52:26.692Z"}
+{"level":"info","message":"Memory: 26.64 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:52:26.692Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:53:26.692Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:53:26.692Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:53:26.692Z"}
+{"level":"info","message":"Memory: 27.07 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:53:26.692Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:54:26.692Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:54:26.692Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:54:26.692Z"}
+{"level":"info","message":"Memory: 27.09 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:54:26.692Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:55:26.692Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:55:26.692Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:55:26.693Z"}
+{"level":"info","message":"Memory: 32.67 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:55:26.693Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:56:26.692Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:56:26.692Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:56:26.692Z"}
+{"level":"info","message":"Memory: 33.02 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:56:26.692Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:57:26.732Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:57:26.732Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:57:26.732Z"}
+{"level":"info","message":"Memory: 37.04 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:57:26.732Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:58:26.733Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:58:26.734Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:58:26.734Z"}
+{"level":"info","message":"Memory: 39.85 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:58:26.734Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T00:59:26.734Z"}
+{"level":"info","message":"📊 Status Update (8 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T00:59:26.734Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T00:59:26.734Z"}
+{"level":"info","message":"Memory: 28.11 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T00:59:26.735Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:00:26.734Z"}
+{"level":"info","message":"📊 Status Update (9 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:00:26.735Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:00:26.735Z"}
+{"level":"info","message":"Memory: 28.85 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:00:26.735Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:01:26.735Z"}
+{"level":"info","message":"📊 Status Update (10 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:01:26.735Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:01:26.736Z"}
+{"level":"info","message":"Memory: 42.49 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:01:26.736Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:02:26.736Z"}
+{"level":"info","message":"📊 Status Update (11 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:02:26.736Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:02:26.737Z"}
+{"level":"info","message":"Memory: 27.61 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:02:26.737Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:03:26.735Z"}
+{"level":"info","message":"📊 Status Update (12 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:03:26.735Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:03:26.735Z"}
+{"level":"info","message":"Memory: 28.64 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:03:26.736Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T01:03:56.984Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:04:26.735Z"}
+{"level":"info","message":"📊 Status Update (13 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:04:26.735Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:04:26.736Z"}
+{"level":"info","message":"Memory: 32.92 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:04:26.736Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:05:26.736Z"}
+{"level":"info","message":"📊 Status Update (14 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:05:26.736Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:05:26.736Z"}
+{"level":"info","message":"Memory: 30.23 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:05:26.736Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:06:26.737Z"}
+{"level":"info","message":"📊 Status Update (15 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:06:26.737Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:06:26.737Z"}
+{"level":"info","message":"Memory: 30.97 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:06:26.737Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T01:06:29.224Z"}
+{"level":"info","message":"📛 Shutting down...","service":"main-orchestrator","timestamp":"2025-10-07T01:06:29.225Z"}
+{"level":"info","message":"👋 Shutdown complete","service":"main-orchestrator","timestamp":"2025-10-07T01:06:37.719Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.109Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.110Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.224Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.224Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.225Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.225Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.226Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.643Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.644Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.644Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.644Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.645Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.645Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.652Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.654Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.656Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.656Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.657Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.658Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.658Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.658Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T01:33:07.658Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.268Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.268Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.268Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.268Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.268Z"}
+{"level":"info","message":"Time: 2025-10-07T01:33:30.269Z","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.269Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.269Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:33:30.269Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:34:30.271Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:34:30.271Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:34:30.272Z"}
+{"level":"info","message":"Memory: 26.85 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:34:30.272Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:35:30.270Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:35:30.270Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:35:30.271Z"}
+{"level":"info","message":"Memory: 27.13 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:35:30.271Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:36:30.270Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:36:30.270Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:36:30.270Z"}
+{"level":"info","message":"Memory: 27.11 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:36:30.271Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:37:30.272Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:37:30.272Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:37:30.272Z"}
+{"level":"info","message":"Memory: 37.68 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:37:30.272Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:38:30.273Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:38:30.273Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:38:30.273Z"}
+{"level":"info","message":"Memory: 31.09 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:38:30.273Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T01:39:18.095Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:39:30.274Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:39:30.274Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:39:30.274Z"}
+{"level":"info","message":"Memory: 27.97 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:39:30.274Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:40:30.274Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:40:30.274Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:40:30.274Z"}
+{"level":"info","message":"Memory: 37.95 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:40:30.274Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T01:40:36.733Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:41:30.273Z"}
+{"level":"info","message":"📊 Status Update (8 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:41:30.274Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:41:30.274Z"}
+{"level":"info","message":"Memory: 29.55 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:41:30.274Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T01:41:37.190Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T01:46:38.960Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T01:46:38.963Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.015Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.015Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.016Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.020Z"}
+{"level":"info","message":"📝 Running in SIMULATION mode - no real trades","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.020Z"}
+{"level":"info","message":"📝 Simulation mode - skipping contract check","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.020Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.021Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.028Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.030Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.032Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.032Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.032Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.032Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"Mode: simulate","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.033Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.034Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.034Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T01:46:39.035Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.973Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.973Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.973Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.974Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.974Z"}
+{"level":"info","message":"Time: 2025-10-07T01:46:52.974Z","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.974Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.975Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:46:52.975Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:47:52.976Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:47:52.976Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:47:52.977Z"}
+{"level":"info","message":"Memory: 25.01 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:47:52.977Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:48:52.976Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:48:52.977Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:48:52.977Z"}
+{"level":"info","message":"Memory: 25.22 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:48:52.977Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:49:52.976Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:49:52.977Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:49:52.977Z"}
+{"level":"info","message":"Memory: 25.50 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:49:52.977Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T01:50:23.148Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:50:52.976Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:50:52.977Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:50:52.977Z"}
+{"level":"info","message":"Memory: 27.65 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:50:52.977Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:51:52.976Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:51:52.976Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:51:52.976Z"}
+{"level":"info","message":"Memory: 29.45 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:51:52.977Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:52:52.977Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:52:52.977Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:52:52.977Z"}
+{"level":"info","message":"Memory: 30.35 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:52:52.978Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:53:52.977Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:53:52.978Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:53:52.978Z"}
+{"level":"info","message":"Memory: 40.71 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:53:52.978Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T01:54:00.809Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:54:52.978Z"}
+{"level":"info","message":"📊 Status Update (8 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:54:52.978Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:54:52.979Z"}
+{"level":"info","message":"Memory: 29.49 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:54:52.979Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T01:55:52.979Z"}
+{"level":"info","message":"📊 Status Update (9 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T01:55:52.979Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T01:55:52.979Z"}
+{"level":"info","message":"Memory: 29.98 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T01:55:52.979Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T01:56:07.062Z"}
+{"level":"info","message":"📛 Shutting down...","service":"main-orchestrator","timestamp":"2025-10-07T01:56:07.062Z"}
+{"level":"info","message":"👋 Shutdown complete","service":"main-orchestrator","timestamp":"2025-10-07T01:56:07.667Z"}

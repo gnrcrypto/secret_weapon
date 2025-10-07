@@ -1,21 +1,47 @@
-import winston from 'winston';
-declare const logger: winston.Logger;
-declare class ArbitrageBotApplication {
+/**
+ * Main Orchestrator
+ * Coordinates all components of the arbitrage bot
+ */
+export declare class MainOrchestrator {
+    private dataSource;
+    private marketWatcher;
+    private healthAPI;
     private isRunning;
     private startTime;
-    private watcher;
-    private dataSource;
+    constructor();
+    /**
+     * Initialize all components
+     */
     initialize(): Promise<void>;
-    private initializeDatabase;
-    private initializeServices;
-    private registerShutdownHandlers;
+    /**
+     * Verify wallet configuration
+     */
+    private verifyWallet;
+    /**
+     * Check and deploy smart contract if needed
+     */
+    private checkSmartContract;
+    /**
+     * Setup event listeners
+     */
+    private setupEventListeners;
+    /**
+     * Start the orchestrator
+     */
     start(): Promise<void>;
-    private startServices;
-    private runMainLoop;
-    private checkSystemHealth;
-    stop(): Promise<void>;
-    getStatus(): object;
+    /**
+     * Display current status
+     */
+    private displayStatus;
+    /**
+     * Start periodic status updates
+     */
+    private startStatusUpdates;
+    /**
+     * Graceful shutdown
+     */
+    shutdown(): Promise<void>;
 }
-declare const app: ArbitrageBotApplication;
-export { app, logger };
+declare const orchestrator: MainOrchestrator;
+export default orchestrator;
 //# sourceMappingURL=index.d.ts.map

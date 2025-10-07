@@ -3,6 +3,7 @@ import Joi from 'joi';
 
 // Load environment variables
 dotenvConfig();
+export type DexName = 'quickswap' | 'sushiswap' | 'uniswapv3';
 
 const configSchema = Joi.object({
   network: Joi.object({
@@ -45,14 +46,22 @@ const configSchema = Joi.object({
     maxFlashloanUsd: Joi.number().min(0).default(100000),
     flashloanFeeBps: Joi.number().min(0).max(100).default(9),
   }),
+  // Then update the dex schema:
   dex: Joi.object({
-    enabledDexes: Joi.array().items(Joi.string()).min(1).required(),
+    enabledDexes: Joi.array().items(
+      Joi.string().valid('quickswap', 'sushiswap', 'uniswapv3')
+    ).min(1).required(),
     quickswapRouter: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
     sushiswapRouter: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
-    uniswapV3Router: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).optional(),
+    uniswapV3Router: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(), // Changed from optional to required
   }),
   database: Joi.object({
-    accountingDbUrl: Joi.string().required(),
+    host: Joi.string().default('localhost'),
+    port: Joi.number().default(5432),
+    username: Joi.string().default('arbitrage_user'),
+    password: Joi.string().default('pass'),
+    database: Joi.string().default('arbitrage_bot'),
+    accountingDbUrl: Joi.string().optional(),
     redisUrl: Joi.string().default('redis://localhost:6379'),
     poolSize: Joi.number().min(5).max(100).default(20),
   }),
@@ -104,6 +113,17 @@ const configSchema = Joi.object({
   }),
 });
 
+// Helper function to construct database URL
+function getDatabaseUrl(): string {
+  const host = process.env.DB_HOST || 'localhost';
+  const port = process.env.DB_PORT || '5432';
+  const username = process.env.DB_USERNAME || 'arbitrage_user';
+  const password = process.env.DB_PASSWORD || 'pass';
+  const database = process.env.DB_NAME || 'arbitrage_bot';
+  
+  return `postgresql://${username}:${password}@${host}:${port}/${database}`;
+}
+
 // Parse environment variables into config object
 const rawConfig = {
   network: {
@@ -113,8 +133,8 @@ const rawConfig = {
     blockPollingInterval: parseInt(process.env.BLOCK_POLLING_INTERVAL_MS || '100'),
   },
   wallet: {
-    privateKey: process.env.PRIVATE_KEY_PLACEHOLDER,
-    mnemonic: process.env.MNEMONIC_PLACEHOLDER,
+    privateKey: process.env.PRIVATE_KEY,
+    mnemonic: process.env.MNEMONIC,
     address: process.env.HOT_WALLET_ADDRESS,
   },
   providers: {
@@ -147,13 +167,18 @@ const rawConfig = {
     flashloanFeeBps: parseFloat(process.env.FLASHLOAN_FEE_BPS || '9'),
   },
   dex: {
-    enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap'],
+    enabledDexes: (process.env.ENABLED_DEXES?.split(',') as DexName[]) || ['quickswap', 'sushiswap', 'uniswapv3'], // Default to all three
     quickswapRouter: process.env.QUICKSWAP_ROUTER!,
     sushiswapRouter: process.env.SUSHISWAP_ROUTER!,
-    uniswapV3Router: process.env.UNISWAPV3_ROUTER,
+    uniswapV3Router: process.env.UNISWAPV3_ROUTER!, // Changed from optional to required
   },
   database: {
-    accountingDbUrl: process.env.ACCOUNTING_DB_URL!,
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME || 'arbitrage_user',
+    password: process.env.DB_PASSWORD || 'pass',
+    database: process.env.DB_NAME || 'arbitrage_bot',
+    accountingDbUrl: process.env.ACCOUNTING_DB_URL || getDatabaseUrl(),
     redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
     poolSize: parseInt(process.env.DB_POOL_SIZE || '20'),
   },
@@ -222,12 +247,12 @@ if (error) {
 export const Config = validatedConfig as typeof rawConfig;
 
 export const ADDRESSES = {
-  WMATIC: '0x0d500B1d8E8eF31E21C99d1DbD9735AFf958023239c6A063',
+  WMATIC: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
   USDC: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
   USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
   DAI: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
   WETH: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
-  WBTC: '0x1bFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+  WBTC: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
   AAVE_LENDING_POOL: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
   BALANCER_VAULT: '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
   ROUTERS: {
@@ -252,6 +277,7 @@ export const isProduction = (): boolean => {
   return process.env.NODE_ENV === 'production' && Config.execution.mode === 'live';
 };
 
+// FIXED: Added missing parameter name
 export const validatePartialConfig = (partialConfig: Partial<typeof rawConfig>): boolean => {
   const mergedConfig = { ...Config, ...partialConfig };
   const { error } = configSchema.validate(mergedConfig);
@@ -266,6 +292,7 @@ export const logConfig = (): void => {
   if (sanitized.wallet.mnemonic) sanitized.wallet.mnemonic = '***HIDDEN***';
   if (sanitized.providers.infuraKey) sanitized.providers.infuraKey = '***HIDDEN***';
   if (sanitized.providers.alchemyKey) sanitized.providers.alchemyKey = '***HIDDEN***';
+  if (sanitized.database.password) sanitized.database.password = '***HIDDEN***';
   if (sanitized.database.accountingDbUrl) {
     sanitized.database.accountingDbUrl = sanitized.database.accountingDbUrl.replace(/:\/\/[^@]+@/, '://***:***@');
   }
@@ -273,4 +300,16 @@ export const logConfig = (): void => {
   if (sanitized.alerts.slackWebhookUrl) sanitized.alerts.slackWebhookUrl = '***HIDDEN***';
 
   console.log('Configuration loaded:', JSON.stringify(sanitized, null, 2));
+};
+
+// Export database connection helper
+export const getDatabaseConnectionConfig = () => {
+  return {
+    host: Config.database.host,
+    port: Config.database.port,
+    username: Config.database.username,
+    password: Config.database.password,
+    database: Config.database.database,
+    url: Config.database.accountingDbUrl,
+  };
 };

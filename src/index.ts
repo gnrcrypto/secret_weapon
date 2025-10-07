@@ -1,17 +1,19 @@
-// src/index.ts
-import { Config } from './config';
-import { provider, wallet, nonceManager } from './providers/polygonProvider';
-import winston from 'winston';
-import { ethers } from 'ethers';
-import { createWatcher } from './services/watcher';
+import { Config, isSimulationMode } from './config';
 import { DataSource } from 'typeorm';
-
+import { provider, wallet } from './providers/polygonProvider';
+import { MarketWatcher } from './services/watcher';
+import { HealthAPI } from './api/health';
+import { getMetricsService } from './monitoring/metrics';
+import { getRiskManager } from './risk/riskManager';
+// import { Ledger } from './accounting/ledger';
 import { TradeEntity } from './database/entities/trade.entity';
 import { WalletEntity } from './database/entities/wallet.entity';
 import { TokenEntity } from './database/entities/token.entity';
 import { DexEntity } from './database/entities/dex.entity';
+import winston from 'winston';
+import { ethers } from 'ethers';
 
-// ---------------- Logger Setup ----------------
+// Logger setup
 const logger = winston.createLogger({
   level: Config.monitoring.logLevel,
   format: winston.format.combine(
@@ -19,310 +21,380 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { service: 'polygon-arbitrage-bot' },
+  defaultMeta: { service: 'main-orchestrator' },
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
+        winston.format.printf(({ level, message, timestamp }) => {
+          return `${timestamp} [${level}]: ${message}`;
+        })
       ),
     }),
-    new winston.transports.File({
-      filename: 'logs/error.log',
+    new winston.transports.File({ 
+      filename: 'logs/error.log', 
       level: 'error',
-      maxsize: 10 * 1024 * 1024,
+      maxsize: 10485760,
       maxFiles: 5,
     }),
-    new winston.transports.File({
+    new winston.transports.File({ 
       filename: 'logs/combined.log',
-      maxsize: 10 * 1024 * 1024,
+      maxsize: 10485760,
       maxFiles: 10,
     }),
   ],
 });
 
-// ---------------- Helpers ----------------
-function logConfig(): void {
-  logger.info('Configuration:', {
-    mode: Config.execution.mode,
-    network: Config.network.chainId,
-    dexes: Config.dex.enabledDexes,
-    minProfit: Config.execution.minProfitThresholdUsd,
-  });
-}
-
-function isSimulationMode(): boolean {
-  return Config.execution.mode === 'simulate';
-}
-
-// Helper to safely unwrap the provider
-function unwrapProvider(p: any): ethers.JsonRpcProvider | ethers.WebSocketProvider | ethers.FallbackProvider {
-  if (p && typeof p.get === 'function') return p.get();
-  return p;
-}
-
-// ---------------- Graceful Shutdown ----------------
-class ShutdownManager {
-  private shutdownCallbacks: Array<() => Promise<void>> = [];
-  private isShuttingDown = false;
-
-  register(callback: () => Promise<void>): void {
-    this.shutdownCallbacks.push(callback);
-  }
-
-  async shutdown(signal: string): Promise<void> {
-    if (this.isShuttingDown) {
-      logger.warn('Shutdown already in progress');
-      return;
-    }
-    this.isShuttingDown = true;
-    logger.info(`Received ${signal}, initiating graceful shutdown...`);
-
-    const shutdownTimeout = setTimeout(() => {
-      logger.error('Shutdown timeout exceeded, forcing exit');
-      process.exit(1);
-    }, 30000);
-
-    try {
-      await Promise.all(
-        this.shutdownCallbacks.map(callback =>
-          callback().catch(err => logger.error('Shutdown callback error:', err))
-        )
-      );
-      clearTimeout(shutdownTimeout);
-      logger.info('Graceful shutdown completed');
-      process.exit(0);
-    } catch (error) {
-      logger.error('Error during shutdown:', error);
-      clearTimeout(shutdownTimeout);
-      process.exit(1);
-    }
-  }
-}
-
-const shutdownManager = new ShutdownManager();
-
-// ---------------- Main App ----------------
-class ArbitrageBotApplication {
+/**
+ * Main Orchestrator
+ * Coordinates all components of the arbitrage bot
+ */
+export class MainOrchestrator {
+  private dataSource: DataSource;
+  private marketWatcher: MarketWatcher | null = null;
+  // private ledger: Ledger | null = null;
+  private healthAPI: HealthAPI | null = null;
   private isRunning = false;
   private startTime = Date.now();
-  private watcher: any;
-  private dataSource: DataSource | null = null;
-
-  async initialize(): Promise<void> {
-    logger.info('='.repeat(50));
-    logger.info('Polygon Arbitrage Bot Starting...');
-    logger.info('='.repeat(50));
-    logConfig();
-
-    logger.info('Initializing providers...');
-    if (typeof provider.initialize === 'function') provider.initialize();
-    if (typeof provider.startMonitoring === 'function') provider.startMonitoring();
-
-    if (!isSimulationMode()) {
-      logger.info('Initializing wallet...');
-      if (typeof (wallet as any).initialize === 'function') (wallet as any).initialize();
-
-      const address = typeof (wallet as any).getAddress === 'function' ? await (wallet as any).getAddress() : (wallet as any).address;
-      const balance = await (wallet as any).getBalance();
-      logger.info(`Wallet Address: ${address}`);
-      logger.info(`Wallet Balance: ${ethers.formatEther(balance)} MATIC`);
-
-      const minBalance = ethers.parseEther('0.1');
-      if (balance < minBalance) {
-        logger.warn(`Low balance warning: ${ethers.formatEther(balance)} MATIC`);
-        if (Config.execution.mode === 'live') {
-          throw new Error('Insufficient balance for live trading');
-        }
-      }
-    } else {
-      logger.info('Running in SIMULATION mode - no real transactions will be executed');
-    }
-
-    // Verify network
-    try {
-      const currentProvider = unwrapProvider(provider);
-      const network = await currentProvider.getNetwork();
-      if (network.chainId !== BigInt(Config.network.chainId)) {
-        throw new Error(`Wrong network: expected ${Config.network.chainId}, got ${network.chainId}`);
-      }
-      logger.info(`Connected to Polygon network (chainId: ${network.chainId})`);
-    } catch (error) {
-      logger.error('Failed to verify network connection:', error);
-      if (Config.execution.mode === 'live') throw new Error('Network connection failed');
-      logger.warn('Continuing in simulation mode despite network issues');
-    }
-
-    // Initialize TypeORM DB
-    await this.initializeDatabase();
-
-    // Initialize services (Ledger, Watcher, etc.)
-    await this.initializeServices();
-
-    // Register graceful shutdown
-    this.registerShutdownHandlers();
-
-    logger.info('Initialization complete ✅');
-  }
-
-  // ---------------- Real Database Connection ----------------
-  private async initializeDatabase(): Promise<void> {
-    logger.info('Initializing database connections...');
-
+  
+  constructor() {
+    // Setup database connection
+    const dbUrl = new URL(Config.database.accountingDbUrl);
+    
     this.dataSource = new DataSource({
-      type: 'sqlite',
-      database: 'arbitrage.db',
-      synchronize: true,
-      logging: false,
+      type: 'postgres',
+      host: dbUrl.hostname,
+      port: parseInt(dbUrl.port || '5432'),
+      username: dbUrl.username,
+      password: dbUrl.password,
+      database: dbUrl.pathname.slice(1), // Remove leading '/'
       entities: [TradeEntity, WalletEntity, TokenEntity, DexEntity],
-    });
-
-    await this.dataSource.initialize();
-    logger.info('Database connected successfully ✅');
-  }
-
-  // ---------------- Service Initialization ----------------
-  private async initializeServices(): Promise<void> {
-    logger.info('Initializing services...');
-    if (this.dataSource) {
-      this.watcher = createWatcher(this.dataSource);
-      logger.info('Watcher service initialized with database');
-    } else {
-      logger.warn('No data source available, watcher not initialized');
-    }
-    logger.info('All services initialized');
-  }
-
-  private registerShutdownHandlers(): void {
-    shutdownManager.register(async () => {
-      logger.info('Shutting down providers...');
-      if (typeof provider.stopMonitoring === 'function') provider.stopMonitoring();
-    });
-
-    shutdownManager.register(async () => {
-      logger.info('Shutting down services...');
-      if (this.watcher && typeof this.watcher.stop === 'function') this.watcher.stop();
-      if (this.dataSource && typeof this.dataSource.destroy === 'function') await this.dataSource.destroy();
-    });
-
-    shutdownManager.register(async () => {
-      logger.info('Finalizing pending transactions...');
-      if (nonceManager && typeof (nonceManager as any).releaseAllNonces === 'function') {
-        (nonceManager as any).releaseAllNonces();
-      }
+      synchronize: process.env.NODE_ENV !== 'production',
+      logging: Config.monitoring.logLevel === 'debug',
+      poolSize: Config.database.poolSize,
     });
   }
-
-  // ---------------- Runtime ----------------
-  async start(): Promise<void> {
-    if (this.isRunning) {
-      logger.warn('Bot is already running');
-      return;
-    }
+  
+  /**
+   * Initialize all components
+   */
+  async initialize(): Promise<void> {
+    logger.info('🚀 Initializing Polygon Arbitrage Bot...');
+    
     try {
-      await this.initialize();
-      this.isRunning = true;
-
-      logger.info('='.repeat(50));
-      logger.info('Bot is now running!');
-      logger.info(`Mode: ${Config.execution.mode.toUpperCase()}`);
-      logger.info(`Start time: ${new Date().toISOString()}`);
-      logger.info('='.repeat(50));
-
-      await this.startServices();
-      await this.runMainLoop();
+      // 1. Initialize database
+      logger.info('📊 Connecting to database...');
+      await this.dataSource.initialize();
+      logger.info('✅ Database connected');
+      
+      // 2. Initialize ledger
+      // this.ledger = new Ledger(this.dataSource);
+      // logger.info('✅ Ledger initialized');
+      
+      // 3. Initialize providers
+      logger.info('🌐 Initializing blockchain providers...');
+      provider.initialize();
+      provider.startMonitoring();
+      logger.info('✅ Providers initialized');
+      
+      // 4. Verify wallet
+      await this.verifyWallet();
+      
+      // 5. Check and deploy smart contract
+      await this.checkSmartContract();
+      
+      // 6. Initialize services
+      logger.info('🔧 Starting services...');
+      
+      // Start metrics service
+      const metricsService = getMetricsService();
+      metricsService.start();
+      logger.info('✅ Metrics service started');
+      
+      // Start health API
+      this.healthAPI = new HealthAPI();
+      this.healthAPI.start();
+      logger.info('✅ Health API started');
+      
+      // Initialize market watcher
+      this.marketWatcher = new MarketWatcher(this.dataSource);
+      logger.info('✅ Market watcher initialized');
+      
+      // Setup event listeners
+      this.setupEventListeners();
+      
+      logger.info('✨ Initialization complete!');
+      this.displayStatus();
+      
     } catch (error) {
-      logger.error('Failed to start bot:', error);
+      logger.error('❌ Initialization failed:', error);
       throw error;
     }
   }
-
-  private async startServices(): Promise<void> {
-    if (this.watcher && typeof this.watcher.start === 'function') {
-      this.watcher.start();
-      logger.info('Watcher service started');
+  
+  /**
+   * Verify wallet configuration
+   */
+  private async verifyWallet(): Promise<void> {
+    if (isSimulationMode()) {
+      logger.info('📝 Running in SIMULATION mode - no real trades');
+      return;
     }
-  }
-
-  private async runMainLoop(): Promise<void> {
-    logger.info('Main arbitrage loop started');
-    while (this.isRunning) {
-      try {
-        await this.checkSystemHealth();
-        if ((Date.now() - this.startTime) % 30000 < 1000) {
-          const uptime = Math.floor((Date.now() - this.startTime) / 1000);
-          logger.info(`Heartbeat - Uptime: ${uptime}s, Mode: ${Config.execution.mode}`);
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        logger.error('Error in main loop:', error);
-        await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    logger.info('💰 Verifying wallet...');
+    const address = wallet.getAddress();
+    const balance = await wallet.getBalance();
+    const balanceEther = ethers.formatEther(balance);
+    
+    logger.info(`📍 Wallet Address: ${address}`);
+    logger.info(`💎 MATIC Balance: ${balanceEther}`);
+    
+    // Check minimum balance
+    const minBalance = ethers.parseEther('5'); // 5 MATIC minimum
+    if (balance < minBalance) {
+      if (Config.execution.mode === 'live') {
+        throw new Error(`Insufficient balance: ${balanceEther} MATIC (minimum: 5 MATIC)`);
+      } else {
+        logger.warn('⚠️  Low balance warning');
       }
     }
+    
+    logger.info('✅ Wallet verified');
   }
-
-  private async checkSystemHealth(): Promise<void> {
+  
+  /**
+   * Check and deploy smart contract if needed
+   */
+  private async checkSmartContract(): Promise<void> {
+    if (isSimulationMode()) {
+      logger.info('📝 Simulation mode - skipping contract check');
+      return;
+    }
+    
+    logger.info('📜 Checking smart contract...');
+    
+    // For now, just log a message about contract deployment
+    // The actual ContractManager would be implemented separately
+    logger.info('💡 Smart contract check skipped (ContractManager not implemented)');
+    
+    if (Config.flashloan.enabled) {
+      logger.warn('⚠️  Flash loans require a deployed smart contract');
+      logger.info('💡 Deploy with: npx hardhat deploy --network polygon');
+    }
+  }
+  
+  /**
+   * Setup event listeners
+   */
+  private setupEventListeners(): void {
+    if (!this.marketWatcher) return;
+    
+    // Market watcher events
+    this.marketWatcher.on('opportunity-found', async (opportunity) => {
+      logger.info(`💡 Opportunity: ${opportunity.simulation.path.id} - Profit: $${opportunity.simulation.netProfitUsd.toFixed(2)}`);
+      
+      // Update metrics
+      const metrics = getMetricsService();
+      metrics.recordOpportunity(
+        opportunity.simulation.path.type,
+        opportunity.simulation.path.dexes[0]
+      );
+    });
+    
+    this.marketWatcher.on('trade-executed', async (result) => {
+      if (result.success) {
+        logger.info(`✅ Trade successful: ${result.transactionHash}`);
+      } else {
+        logger.error(`❌ Trade failed: ${result.error}`);
+      }
+      
+      // Update metrics
+      const metrics = getMetricsService();
+      metrics.recordTrade(
+        'unknown', // Should be passed in result
+        'unknown',
+        result.success,
+        result.actualProfit ? parseFloat(ethers.formatEther(result.actualProfit)) * 0.8 : 0,
+        result.gasUsed || BigInt(0),
+        Date.now() - result.timestamp
+      );
+    });
+    
+    this.marketWatcher.on('error', (error) => {
+      logger.error('❌ Watcher error:', error);
+      
+      const metrics = getMetricsService();
+      metrics.recordError('watcher', 'high');
+    });
+    
+    // Risk manager events
+    const riskManager = getRiskManager();
+    
+    riskManager.on('circuit-breaker-triggered', (reason) => {
+      logger.error(`🚨 CIRCUIT BREAKER: ${reason}`);
+      
+      // Update metrics
+      const metrics = getMetricsService();
+      metrics.updateCircuitBreaker(true);
+      metrics.recordError('circuit_breaker', 'critical');
+      
+      // Pause watcher
+      if (this.marketWatcher) {
+        this.marketWatcher.pause();
+      }
+    });
+    
+    riskManager.on('daily-limit-reached', (limitType, current, limit) => {
+      logger.warn(`⚠️  Daily limit: ${limitType} - ${current}/${limit}`);
+      
+      const metrics = getMetricsService();
+      metrics.recordError('daily_limit', 'medium');
+    });
+  }
+  
+  /**
+   * Start the orchestrator
+   */
+  async start(): Promise<void> {
+    if (this.isRunning) {
+      logger.warn('Bot already running');
+      return;
+    }
+    
     try {
-      const currentProvider = unwrapProvider(provider);
-      await currentProvider.getBlockNumber();
+      await this.initialize();
+      
+      logger.info('🏁 Starting arbitrage bot...');
+      
+      // Start market watching
+      if (this.marketWatcher) {
+        await this.marketWatcher.start();
+      }
+      
+      this.isRunning = true;
+      this.startTime = Date.now();
+      
+      logger.info('');
+      logger.info('=' .repeat(60));
+      logger.info('🤖 POLYGON ARBITRAGE BOT IS RUNNING');
+      logger.info('=' .repeat(60));
+      logger.info(`Mode: ${Config.execution.mode.toUpperCase()}`);
+      logger.info(`Time: ${new Date().toISOString()}`);
+      logger.info('=' .repeat(60));
+      logger.info('');
+      
+      // Start periodic status updates
+      this.startStatusUpdates();
+      
     } catch (error) {
-      logger.warn('Provider health check failed:', error);
-      if (typeof (provider as any).switchProvider === 'function') {
-        const switched = await (provider as any).switchProvider();
-        if (switched) logger.info('Successfully switched to backup provider');
-      }
+      logger.error('Failed to start bot:', error);
+      await this.shutdown();
+      throw error;
     }
-
-    if (!isSimulationMode() && (wallet as any).getBalance) {
-      try {
-        const balance = await (wallet as any).getBalance();
-        const balanceEth = parseFloat(ethers.formatEther(balance));
-        if (balanceEth < 0.1) {
-          logger.error(`CRITICAL: Very low balance: ${balanceEth} MATIC`);
+  }
+  
+  /**
+   * Display current status
+   */
+  private displayStatus(): void {
+    const riskManager = getRiskManager();
+    const riskMetrics = riskManager.getMetrics();
+    
+    logger.info('');
+    logger.info('📈 Current Status:');
+    logger.info('─'.repeat(40));
+    logger.info(`Mode: ${Config.execution.mode}`);
+    logger.info(`Circuit Breaker: ${riskMetrics.circuitBreakerActive ? '🔴 ACTIVE' : '🟢 OK'}`);
+    logger.info(`Daily P&L: $${(riskMetrics.dailyProfit - riskMetrics.dailyLoss).toFixed(2)}`);
+    logger.info(`Daily Trades: ${riskMetrics.dailyTrades}`);
+    logger.info(`Enabled DEXes: ${Config.dex.enabledDexes.join(', ')}`);
+    logger.info('─'.repeat(40));
+    logger.info('');
+  }
+  
+  /**
+   * Start periodic status updates
+   */
+  private startStatusUpdates(): void {
+    setInterval(() => {
+      if (!this.isRunning) return;
+      
+      const uptime = Math.floor((Date.now() - this.startTime) / 1000 / 60);
+      
+      if (this.marketWatcher) {
+        const status = this.marketWatcher.getStatus();
+        const performance = this.marketWatcher.getPerformanceMetrics() as any;
+        
+        logger.info('');
+        logger.info(`📊 Status Update (${uptime} min uptime)`);
+        logger.info(`Opportunities: ${status.opportunitiesFound} | Trades: ${status.tradesExecuted} | Profit: ${status.profitGenerated.toFixed(2)}`);
+        
+        if (performance.memoryUsageMB && performance.queueSize !== undefined) {
+          logger.info(`Memory: ${performance.memoryUsageMB} MB | Queue: ${performance.queueSize}`);
         }
-      } catch (error) {
-        logger.warn('Failed to check wallet balance:', error);
       }
-    }
+    }, 60000); // Every minute
   }
-
-  async stop(): Promise<void> {
-    logger.info('Stopping bot...');
+  
+  /**
+   * Graceful shutdown
+   */
+  async shutdown(): Promise<void> {
+    logger.info('📛 Shutting down...');
+    
     this.isRunning = false;
-    if (this.watcher && typeof this.watcher.stop === 'function') this.watcher.stop();
-  }
-
-  getStatus(): object {
-    return {
-      isRunning: this.isRunning,
-      uptime: Date.now() - this.startTime,
-      mode: Config.execution.mode,
-      startTime: new Date(this.startTime).toISOString(),
-      walletAddress: (wallet as any).getAddress ? (wallet as any).getAddress() : (wallet as any).address,
-    };
+    
+    // Stop market watcher
+    if (this.marketWatcher) {
+      await this.marketWatcher.stop();
+    }
+    
+    // Close database
+    if (this.dataSource.isInitialized) {
+      await this.dataSource.destroy();
+    }
+    
+    // Cleanup risk manager
+    const riskManager = getRiskManager();
+    riskManager.destroy();
+    
+    logger.info('👋 Shutdown complete');
   }
 }
 
-// ---------------- Startup ----------------
-const app = new ArbitrageBotApplication();
+// Signal handlers
+const orchestrator = new MainOrchestrator();
 
-process.on('SIGINT', () => shutdownManager.shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdownManager.shutdown('SIGTERM'));
-process.on('SIGHUP', () => shutdownManager.shutdown('SIGHUP'));
-process.on('uncaughtException', (error) => {
+process.on('SIGINT', async () => {
+  logger.info('Received SIGINT');
+  await orchestrator.shutdown();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  logger.info('Received SIGTERM');
+  await orchestrator.shutdown();
+  process.exit(0);
+});
+
+process.on('uncaughtException', async (error) => {
   logger.error('Uncaught Exception:', error);
-  shutdownManager.shutdown('uncaughtException');
-});
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  shutdownManager.shutdown('unhandledRejection');
+  await orchestrator.shutdown();
+  process.exit(1);
 });
 
+process.on('unhandledRejection', async (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  await orchestrator.shutdown();
+  process.exit(1);
+});
+
+// Start the bot
 if (require.main === module) {
-  app.start().catch((error) => {
-    logger.error('Fatal error during startup:', error);
+  orchestrator.start().catch((error) => {
+    logger.error('Fatal error:', error);
     process.exit(1);
   });
 }
 
-export { app, logger };
+export default orchestrator;

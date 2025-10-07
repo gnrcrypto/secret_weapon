@@ -41,28 +41,24 @@ class Executor {
             pending: 0,
             completed: 0,
             failed: 0,
-            totalProfitWei: BigInt(0),
-            totalGasUsedWei: BigInt(0),
+            totalProfitWei: '0', // Initialize as string
+            totalGasUsedWei: '0', // Initialize as string
             successRate: 0,
         };
     }
     /**
-     * Check if in simulation mode
-     */
-    isSimulationMode() {
-        return config_1.Config.execution.mode === 'simulate'; // Fixed: 'simulate' instead of 'simulation'
-    }
-    /**
      * Execute atomic swap
      */
-    async executeAtomicSwap(opportunity, dryRun = this.isSimulationMode()) {
+    async executeAtomicSwap(opportunity, dryRun = (0, config_1.isSimulationMode)()) {
         const executionId = (0, uuid_1.v4)();
         const simulation = opportunity.simulation;
         logger.info(`Executing atomic swap ${executionId} (dry run: ${dryRun})`);
         try {
             // Build transaction
             const txBuilder = (0, txBuilder_1.getTxBuilder)();
-            const swapTx = await txBuilder.buildAtomicSwapTx(simulation.path, simulation.inputAmount, simulation.outputAmount, undefined, opportunity.executionPriority);
+            const urgency = opportunity.executionPriority === 'high' ? 'high' :
+                opportunity.executionPriority === 'medium' ? 'standard' : 'low';
+            const swapTx = await txBuilder.buildAtomicSwapTx(simulation.path, simulation.inputAmount, simulation.outputAmount, undefined, urgency);
             // Validate before execution
             if (!txBuilder.validateTransaction(swapTx.request)) {
                 throw new Error('Transaction validation failed');
@@ -112,8 +108,7 @@ class Executor {
                 value: swapTx.request.value.toString(),
                 nonce: swapTx.request.nonce,
             });
-            // Sign and send transaction
-            await this.wallet.signTransaction(swapTx.request);
+            // Send transaction (already signed internally)
             const txResponse = await this.wallet.sendTransaction(swapTx.request);
             logger.info(`Transaction ${executionId} submitted: ${txResponse.hash}`);
             // Wait for confirmation
@@ -130,8 +125,11 @@ class Executor {
             this.pendingTransactions.delete(executionId);
             this.executionStatus.pending--;
             this.executionStatus.completed++;
-            this.executionStatus.totalProfitWei += actualProfit;
-            this.executionStatus.totalGasUsedWei += gasCost;
+            // Update profit and gas totals (convert BigInt to string for storage)
+            const currentProfit = BigInt(this.executionStatus.totalProfitWei);
+            const currentGas = BigInt(this.executionStatus.totalGasUsedWei);
+            this.executionStatus.totalProfitWei = (currentProfit + actualProfit).toString();
+            this.executionStatus.totalGasUsedWei = (currentGas + gasCost).toString();
             this.updateSuccessRate();
             logger.info(`Transaction ${executionId} confirmed!`, {
                 hash: receipt.hash,
@@ -200,13 +198,16 @@ class Executor {
         });
         // Simulate gas usage
         const gasUsed = swapTx.request.gasLimit || BigInt(200000);
-        const gasPrice = swapTx.request.gasPrice || (0, math_1.toWei)(config_1.Config.gas.maxGasGwei, 9);
+        const gasPrice = swapTx.request.gasPrice || (0, math_2.toWei)(config_1.Config.gas.maxGasGwei, 9);
         const gasCost = gasUsed * gasPrice;
         const actualProfit = swapTx.metadata.estimatedProfitWei - gasCost;
         // Update simulated status
         this.executionStatus.completed++;
-        this.executionStatus.totalProfitWei += actualProfit;
-        this.executionStatus.totalGasUsedWei += gasCost;
+        // Update profit and gas totals (convert BigInt to string for storage)
+        const currentProfit = BigInt(this.executionStatus.totalProfitWei);
+        const currentGas = BigInt(this.executionStatus.totalGasUsedWei);
+        this.executionStatus.totalProfitWei = (currentProfit + actualProfit).toString();
+        this.executionStatus.totalGasUsedWei = (currentGas + gasCost).toString();
         this.updateSuccessRate();
         return {
             id: executionId,
@@ -295,7 +296,7 @@ class Executor {
         try {
             const txBuilder = (0, txBuilder_1.getTxBuilder)();
             const flashLoanTx = await txBuilder.buildFlashLoanTx(opportunity.simulation.path, flashLoanAmount, opportunity.simulation, provider);
-            if (this.isSimulationMode()) {
+            if ((0, config_1.isSimulationMode)()) {
                 return this.simulateExecution(executionId, flashLoanTx);
             }
             return await this.executeTransaction(executionId, flashLoanTx);
@@ -315,7 +316,14 @@ class Executor {
      * Get execution status
      */
     getStatus() {
-        return { ...this.executionStatus };
+        return {
+            pending: this.executionStatus.pending,
+            completed: this.executionStatus.completed,
+            failed: this.executionStatus.failed,
+            totalProfitWei: this.executionStatus.totalProfitWei.toString(), // Convert BigInt to string
+            totalGasUsedWei: this.executionStatus.totalGasUsedWei.toString(), // Convert BigInt to string
+            successRate: this.executionStatus.successRate,
+        };
     }
     /**
      * Get pending transactions
@@ -341,26 +349,16 @@ class Executor {
             pending: 0,
             completed: 0,
             failed: 0,
-            totalProfitWei: BigInt(0),
-            totalGasUsedWei: BigInt(0),
+            totalProfitWei: '0', // Initialize as string
+            totalGasUsedWei: '0', // Initialize as string
             successRate: 0,
         };
         logger.info('Execution status reset');
     }
-    /**
-     * Emergency stop - stop all pending transactions
-     */
-    async emergencyStop() {
-        logger.warn('Emergency stop triggered - cancelling all pending transactions');
-        // Cancel all pending transactions
-        const pendingIds = Array.from(this.pendingTransactions.keys());
-        for (const id of pendingIds) {
-            await this.cancelTransaction(id);
-        }
-        this.resetStatus();
-    }
 }
 exports.Executor = Executor;
+// Import for toWei
+const math_2 = require("../utils/math");
 // Export singleton instance
 let executor = null;
 function getExecutor() {

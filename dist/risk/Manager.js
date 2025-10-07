@@ -31,7 +31,6 @@ class RiskManager extends events_1.EventEmitter {
     tradeHistory = [];
     circuitBreakerResetTimer = null;
     dailyResetTimer = null;
-    isInitialized = false;
     constructor() {
         super();
         this.metrics = this.initializeMetrics();

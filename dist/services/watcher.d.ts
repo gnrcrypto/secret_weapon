@@ -26,8 +26,7 @@ export declare class MarketWatcher extends EventEmitter {
     private blockQueue;
     private watchInterval;
     private wsProvider;
-    private dataSource;
-    constructor(dataSource: DataSource);
+    constructor(_dataSource: DataSource);
     private setupEventListeners;
     start(): Promise<void>;
     private startWebSocketWatcher;

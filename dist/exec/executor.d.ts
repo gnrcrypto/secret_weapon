@@ -17,8 +17,8 @@ export interface ExecutionStatus {
     pending: number;
     completed: number;
     failed: number;
-    totalProfitWei: bigint;
-    totalGasUsedWei: bigint;
+    totalProfitWei: string;
+    totalGasUsedWei: string;
     successRate: number;
 }
 /**
@@ -31,10 +31,6 @@ export declare class Executor {
     private maxRetries;
     private retryDelay;
     constructor();
-    /**
-     * Check if in simulation mode
-     */
-    private isSimulationMode;
     /**
      * Execute atomic swap
      */
@@ -79,10 +75,6 @@ export declare class Executor {
      * Reset execution status
      */
     resetStatus(): void;
-    /**
-     * Emergency stop - stop all pending transactions
-     */
-    emergencyStop(): Promise<void>;
 }
 export declare function getExecutor(): Executor;
 //# sourceMappingURL=executor.d.ts.map

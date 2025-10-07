@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logConfig = exports.validatePartialConfig = exports.isProduction = exports.isSimulationMode = exports.NETWORK = exports.ADDRESSES = exports.Config = void 0;
+exports.getDatabaseConnectionConfig = exports.logConfig = exports.validatePartialConfig = exports.isProduction = exports.isSimulationMode = exports.NETWORK = exports.ADDRESSES = exports.Config = void 0;
 const dotenv_1 = require("dotenv");
 const joi_1 = __importDefault(require("joi"));
 // Load environment variables
@@ -49,14 +49,20 @@ const configSchema = joi_1.default.object({
         maxFlashloanUsd: joi_1.default.number().min(0).default(100000),
         flashloanFeeBps: joi_1.default.number().min(0).max(100).default(9),
     }),
+    // Then update the dex schema:
     dex: joi_1.default.object({
-        enabledDexes: joi_1.default.array().items(joi_1.default.string()).min(1).required(),
+        enabledDexes: joi_1.default.array().items(joi_1.default.string().valid('quickswap', 'sushiswap', 'uniswapv3')).min(1).required(),
         quickswapRouter: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
         sushiswapRouter: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
-        uniswapV3Router: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).optional(),
+        uniswapV3Router: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(), // Changed from optional to required
     }),
     database: joi_1.default.object({
-        accountingDbUrl: joi_1.default.string().required(),
+        host: joi_1.default.string().default('localhost'),
+        port: joi_1.default.number().default(5432),
+        username: joi_1.default.string().default('arbitrage_user'),
+        password: joi_1.default.string().default('pass'),
+        database: joi_1.default.string().default('arbitrage_bot'),
+        accountingDbUrl: joi_1.default.string().optional(),
         redisUrl: joi_1.default.string().default('redis://localhost:6379'),
         poolSize: joi_1.default.number().min(5).max(100).default(20),
     }),
@@ -107,6 +113,15 @@ const configSchema = joi_1.default.object({
         poolSize: joi_1.default.number().min(1).max(20).default(4),
     }),
 });
+// Helper function to construct database URL
+function getDatabaseUrl() {
+    const host = process.env.DB_HOST || 'localhost';
+    const port = process.env.DB_PORT || '5432';
+    const username = process.env.DB_USERNAME || 'arbitrage_user';
+    const password = process.env.DB_PASSWORD || 'pass';
+    const database = process.env.DB_NAME || 'arbitrage_bot';
+    return `postgresql://${username}:${password}@${host}:${port}/${database}`;
+}
 // Parse environment variables into config object
 const rawConfig = {
     network: {
@@ -116,8 +131,8 @@ const rawConfig = {
         blockPollingInterval: parseInt(process.env.BLOCK_POLLING_INTERVAL_MS || '100'),
     },
     wallet: {
-        privateKey: process.env.PRIVATE_KEY_PLACEHOLDER,
-        mnemonic: process.env.MNEMONIC_PLACEHOLDER,
+        privateKey: process.env.PRIVATE_KEY,
+        mnemonic: process.env.MNEMONIC,
         address: process.env.HOT_WALLET_ADDRESS,
     },
     providers: {
@@ -150,13 +165,18 @@ const rawConfig = {
         flashloanFeeBps: parseFloat(process.env.FLASHLOAN_FEE_BPS || '9'),
     },
     dex: {
-        enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap'],
+        enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap', 'sushiswap', 'uniswapv3'], // Default to all three
         quickswapRouter: process.env.QUICKSWAP_ROUTER,
         sushiswapRouter: process.env.SUSHISWAP_ROUTER,
-        uniswapV3Router: process.env.UNISWAPV3_ROUTER,
+        uniswapV3Router: process.env.UNISWAPV3_ROUTER, // Changed from optional to required
     },
     database: {
-        accountingDbUrl: process.env.ACCOUNTING_DB_URL,
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        username: process.env.DB_USERNAME || 'arbitrage_user',
+        password: process.env.DB_PASSWORD || 'pass',
+        database: process.env.DB_NAME || 'arbitrage_bot',
+        accountingDbUrl: process.env.ACCOUNTING_DB_URL || getDatabaseUrl(),
         redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
         poolSize: parseInt(process.env.DB_POOL_SIZE || '20'),
     },
@@ -221,12 +241,12 @@ if (error) {
 }
 exports.Config = validatedConfig;
 exports.ADDRESSES = {
-    WMATIC: '0x0d500B1d8E8eF31E21C99d1DbD9735AFf958023239c6A063',
+    WMATIC: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
     USDC: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
     USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
     DAI: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
     WETH: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
-    WBTC: '0x1bFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+    WBTC: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
     AAVE_LENDING_POOL: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
     BALANCER_VAULT: '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
     ROUTERS: {
@@ -249,6 +269,7 @@ const isProduction = () => {
     return process.env.NODE_ENV === 'production' && exports.Config.execution.mode === 'live';
 };
 exports.isProduction = isProduction;
+// FIXED: Added missing parameter name
 const validatePartialConfig = (partialConfig) => {
     const mergedConfig = { ...exports.Config, ...partialConfig };
     const { error } = configSchema.validate(mergedConfig);
@@ -266,6 +287,8 @@ const logConfig = () => {
         sanitized.providers.infuraKey = '***HIDDEN***';
     if (sanitized.providers.alchemyKey)
         sanitized.providers.alchemyKey = '***HIDDEN***';
+    if (sanitized.database.password)
+        sanitized.database.password = '***HIDDEN***';
     if (sanitized.database.accountingDbUrl) {
         sanitized.database.accountingDbUrl = sanitized.database.accountingDbUrl.replace(/:\/\/[^@]+@/, '://***:***@');
     }
@@ -276,4 +299,16 @@ const logConfig = () => {
     console.log('Configuration loaded:', JSON.stringify(sanitized, null, 2));
 };
 exports.logConfig = logConfig;
+// Export database connection helper
+const getDatabaseConnectionConfig = () => {
+    return {
+        host: exports.Config.database.host,
+        port: exports.Config.database.port,
+        username: exports.Config.database.username,
+        password: exports.Config.database.password,
+        database: exports.Config.database.database,
+        url: exports.Config.database.accountingDbUrl,
+    };
+};
+exports.getDatabaseConnectionConfig = getDatabaseConnectionConfig;
 //# sourceMappingURL=config.js.map
