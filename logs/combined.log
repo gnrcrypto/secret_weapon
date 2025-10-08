@@ -1510,3 +1510,539 @@
 {"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:13:57.309Z"}
 {"level":"info","message":"Memory: 29.44 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:13:57.309Z"}
 {"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T17:14:42.711Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.472Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.474Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.541Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.541Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.542Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.546Z"}
+{"level":"info","message":"📝 Running in SIMULATION mode - no real trades","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.546Z"}
+{"level":"info","message":"📝 Simulation mode - skipping contract check","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.547Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.547Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.555Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.556Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"Mode: simulate","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.558Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T17:33:47.559Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"Time: 2025-10-07T17:34:02.236Z","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.236Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.237Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:34:02.237Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:35:02.238Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:35:02.238Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:35:02.238Z"}
+{"level":"info","message":"Memory: 27.95 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:35:02.238Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:36:02.238Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:36:02.238Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:36:02.239Z"}
+{"level":"info","message":"Memory: 27.12 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:36:02.239Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:37:02.238Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:37:02.238Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:37:02.238Z"}
+{"level":"info","message":"Memory: 27.60 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:37:02.239Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:38:02.238Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:38:02.239Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:38:02.239Z"}
+{"level":"info","message":"Memory: 27.28 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:38:02.239Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:39:02.238Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:39:02.238Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:39:02.238Z"}
+{"level":"info","message":"Memory: 27.94 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:39:02.238Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:40:02.239Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:40:02.239Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:40:02.239Z"}
+{"level":"info","message":"Memory: 27.98 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:40:02.239Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:41:02.239Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:41:02.239Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:41:02.239Z"}
+{"level":"info","message":"Memory: 28.61 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:41:02.240Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:42:02.240Z"}
+{"level":"info","message":"📊 Status Update (8 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:42:02.241Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:42:02.241Z"}
+{"level":"info","message":"Memory: 28.71 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:42:02.241Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:43:02.241Z"}
+{"level":"info","message":"📊 Status Update (9 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:43:02.241Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:43:02.241Z"}
+{"level":"info","message":"Memory: 29.33 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:43:02.242Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:44:02.242Z"}
+{"level":"info","message":"📊 Status Update (10 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:44:02.242Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:44:02.243Z"}
+{"level":"info","message":"Memory: 29.37 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:44:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:45:02.243Z"}
+{"level":"info","message":"📊 Status Update (11 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:45:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:45:02.243Z"}
+{"level":"info","message":"Memory: 29.99 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:45:02.244Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:46:02.243Z"}
+{"level":"info","message":"📊 Status Update (12 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:46:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:46:02.243Z"}
+{"level":"info","message":"Memory: 30.03 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:46:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:47:02.243Z"}
+{"level":"info","message":"📊 Status Update (13 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:47:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:47:02.243Z"}
+{"level":"info","message":"Memory: 30.68 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:47:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:48:02.242Z"}
+{"level":"info","message":"📊 Status Update (14 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:48:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:48:02.243Z"}
+{"level":"info","message":"Memory: 30.82 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:48:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:49:02.242Z"}
+{"level":"info","message":"📊 Status Update (15 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:49:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:49:02.243Z"}
+{"level":"info","message":"Memory: 30.87 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:49:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:50:02.243Z"}
+{"level":"info","message":"📊 Status Update (16 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:50:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:50:02.243Z"}
+{"level":"info","message":"Memory: 31.45 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:50:02.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:51:02.242Z"}
+{"level":"info","message":"📊 Status Update (17 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:51:02.242Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:51:02.242Z"}
+{"level":"info","message":"Memory: 28.18 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:51:02.243Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T17:51:12.666Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T17:52:02.242Z"}
+{"level":"info","message":"📊 Status Update (18 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T17:52:02.243Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T17:52:02.243Z"}
+{"level":"info","message":"Memory: 30.98 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T17:52:02.243Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T17:52:35.728Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.244Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.246Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.295Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.296Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.296Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.301Z"}
+{"level":"info","message":"📝 Running in SIMULATION mode - no real trades","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.301Z"}
+{"level":"info","message":"📝 Simulation mode - skipping contract check","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.302Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.302Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.309Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.311Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.313Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.314Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.314Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.314Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"Mode: simulate","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T18:17:04.315Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.144Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.144Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.144Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.144Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.144Z"}
+{"level":"info","message":"Time: 2025-10-07T18:17:21.145Z","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.145Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.145Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:17:21.145Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:18:21.147Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:18:21.147Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:18:21.147Z"}
+{"level":"info","message":"Memory: 28.11 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:18:21.147Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:19:21.146Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:19:21.147Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:19:21.147Z"}
+{"level":"info","message":"Memory: 27.20 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:19:21.147Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:20:21.147Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:20:21.147Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:20:21.147Z"}
+{"level":"info","message":"Memory: 27.90 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:20:21.147Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:21:21.147Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:21:21.148Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:21:21.148Z"}
+{"level":"info","message":"Memory: 27.32 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:21:21.148Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:22:21.147Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:22:21.147Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:22:21.147Z"}
+{"level":"info","message":"Memory: 29.40 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:22:21.148Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:23:21.148Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:23:21.149Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:23:21.149Z"}
+{"level":"info","message":"Memory: 29.37 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:23:21.149Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:24:21.148Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T18:24:21.148Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:24:21.148Z"}
+{"level":"info","message":"Memory: 30.07 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:24:21.149Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T18:25:13.721Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.584Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.585Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.661Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.662Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.663Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.664Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:32.664Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.229Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.229Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.230Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.230Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.230Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.231Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.239Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.240Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.242Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.243Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.244Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.244Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.244Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.244Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T18:34:33.245Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.411Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.411Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.411Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.411Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.412Z"}
+{"level":"info","message":"Time: 2025-10-07T18:34:52.412Z","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.412Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.412Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T18:34:52.412Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T18:35:48.663Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.282Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.283Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.364Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.365Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.365Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.366Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.367Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.772Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.772Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.773Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.773Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.774Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.774Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.781Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.783Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.785Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.785Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.786Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.786Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.786Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.786Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.786Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:29:20.787Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.702Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"Time: 2025-10-07T19:29:38.703Z","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:29:38.703Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:30:38.705Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:30:38.705Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:30:38.705Z"}
+{"level":"info","message":"Memory: 34.10 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:30:38.705Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:31:38.704Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:31:38.705Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:31:38.705Z"}
+{"level":"info","message":"Memory: 28.20 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:31:38.705Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:32:38.704Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:32:38.705Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:32:38.705Z"}
+{"level":"info","message":"Memory: 28.74 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:32:38.705Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T19:33:29.397Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:33:38.704Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:33:38.705Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:33:38.705Z"}
+{"level":"info","message":"Memory: 30.97 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:33:38.705Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T19:34:23.195Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.178Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.179Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.252Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.253Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.253Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.253Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.254Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.677Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.678Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.678Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.679Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.679Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.679Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.688Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.689Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.692Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.692Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.693Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.693Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.694Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.694Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.694Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.694Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.695Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.695Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.695Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.695Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:36:21.695Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"Time: 2025-10-07T19:36:46.367Z","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.367Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:36:46.368Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:37:46.368Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:37:46.369Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:37:46.369Z"}
+{"level":"info","message":"Memory: 34.31 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:37:46.369Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:38:46.369Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:38:46.370Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:38:46.370Z"}
+{"level":"info","message":"Memory: 28.74 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:38:46.370Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:39:46.370Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T19:39:46.370Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:39:46.370Z"}
+{"level":"info","message":"Memory: 28.78 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:39:46.371Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T19:39:53.370Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.168Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.170Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.239Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.240Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.241Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.241Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.241Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.696Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.696Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.697Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.697Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.698Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.698Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.706Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.708Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.710Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.710Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.710Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.710Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.710Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.711Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T19:50:21.712Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.323Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.323Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.323Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.324Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.324Z"}
+{"level":"info","message":"Time: 2025-10-07T19:50:49.324Z","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.324Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.324Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T19:50:49.324Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T19:51:15.790Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.297Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.298Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.394Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.394Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.395Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.395Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.396Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.813Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.813Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.814Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.815Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.815Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.815Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.823Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.825Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.827Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.827Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.828Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.829Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.829Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-07T22:38:00.829Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.434Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.435Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.435Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.436Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.436Z"}
+{"level":"info","message":"Time: 2025-10-07T22:38:20.436Z","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.436Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.436Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:38:20.436Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:39:20.438Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:39:20.438Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:39:20.439Z"}
+{"level":"info","message":"Memory: 34.98 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:39:20.439Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:40:20.439Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:40:20.440Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:40:20.440Z"}
+{"level":"info","message":"Memory: 28.63 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:40:20.440Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:41:20.440Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:41:20.441Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:41:20.441Z"}
+{"level":"info","message":"Memory: 29.09 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:41:20.441Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:42:20.441Z"}
+{"level":"info","message":"📊 Status Update (4 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:42:20.442Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:42:20.442Z"}
+{"level":"info","message":"Memory: 28.34 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:42:20.442Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:43:20.441Z"}
+{"level":"info","message":"📊 Status Update (5 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:43:20.441Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:43:20.442Z"}
+{"level":"info","message":"Memory: 28.93 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:43:20.442Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:44:20.441Z"}
+{"level":"info","message":"📊 Status Update (6 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:44:20.442Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:44:20.442Z"}
+{"level":"info","message":"Memory: 29.49 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:44:20.442Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:45:20.441Z"}
+{"level":"info","message":"📊 Status Update (7 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:45:20.442Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:45:20.442Z"}
+{"level":"info","message":"Memory: 29.54 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:45:20.442Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:46:20.441Z"}
+{"level":"info","message":"📊 Status Update (8 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:46:20.441Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:46:20.441Z"}
+{"level":"info","message":"Memory: 30.46 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:46:20.442Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:47:20.442Z"}
+{"level":"info","message":"📊 Status Update (9 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:47:20.442Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:47:20.442Z"}
+{"level":"info","message":"Memory: 47.80 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:47:20.442Z"}
+{"level":"error","message":"❌ Watcher error: Task timed out after 30000ms (queue has 1 running, 0 waiting)","name":"TimeoutError","service":"main-orchestrator","stack":"TimeoutError: Task timed out after 30000ms (queue has 1 running, 0 waiting)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:51:24\n    at new Promise (<anonymous>)\n    at pTimeout (file:///home/nickypoo/secret_weapon/node_modules/p-timeout/index.js:24:25)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:298:37\n    at #tryToStartAnother (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:170:17)\n    at file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:324:36\n    at new Promise (<anonymous>)\n    at PQueue.add (file:///home/nickypoo/secret_weapon/node_modules/p-queue/dist/index.js:269:16)\n    at MarketWatcher.processBlock (/home/nickypoo/secret_weapon/dist/services/watcher.js:116:31)\n    at Timeout._onTimeout (/home/nickypoo/secret_weapon/dist/services/watcher.js:104:32)","timestamp":"2025-10-07T22:47:36.611Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:48:20.442Z"}
+{"level":"info","message":"📊 Status Update (10 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:48:20.443Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:48:20.443Z"}
+{"level":"info","message":"Memory: 40.99 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:48:20.443Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:49:20.443Z"}
+{"level":"info","message":"📊 Status Update (11 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:49:20.443Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:49:20.443Z"}
+{"level":"info","message":"Memory: 36.47 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:49:20.443Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:50:20.443Z"}
+{"level":"info","message":"📊 Status Update (12 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:50:20.444Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:50:20.444Z"}
+{"level":"info","message":"Memory: 55.98 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:50:20.444Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:51:20.443Z"}
+{"level":"info","message":"📊 Status Update (13 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:51:20.443Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:51:20.443Z"}
+{"level":"info","message":"Memory: 34.99 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:51:20.444Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:52:20.443Z"}
+{"level":"info","message":"📊 Status Update (14 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:52:20.444Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:52:20.444Z"}
+{"level":"info","message":"Memory: 33.66 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:52:20.444Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-07T22:53:20.444Z"}
+{"level":"info","message":"📊 Status Update (15 min uptime)","service":"main-orchestrator","timestamp":"2025-10-07T22:53:20.444Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-07T22:53:20.444Z"}
+{"level":"info","message":"Memory: 33.96 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-07T22:53:20.444Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-07T22:53:30.368Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:13:49.418Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-08T06:13:49.420Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-08T06:13:49.532Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:16:29.805Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.571Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.573Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.657Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.657Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.657Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.661Z"}
+{"level":"info","message":"📝 Running in SIMULATION mode - no real trades","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.662Z"}
+{"level":"info","message":"📝 Simulation mode - skipping contract check","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.662Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.662Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.670Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.672Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.673Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.673Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"Mode: simulate","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.674Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.675Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.675Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.675Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.675Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:17:10.675Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.226Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.227Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.227Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.227Z"}
+{"level":"info","message":"Mode: SIMULATE","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.227Z"}
+{"level":"info","message":"Time: 2025-10-08T06:17:24.228Z","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.228Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.228Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:17:24.228Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:18:24.229Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-08T06:18:24.229Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:18:24.230Z"}
+{"level":"info","message":"Memory: 31.28 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:18:24.230Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:19:24.230Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-08T06:19:24.230Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:19:24.230Z"}
+{"level":"info","message":"Memory: 27.51 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:19:24.230Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:20:24.230Z"}
+{"level":"info","message":"📊 Status Update (3 min uptime)","service":"main-orchestrator","timestamp":"2025-10-08T06:20:24.230Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:20:24.231Z"}
+{"level":"info","message":"Memory: 28.22 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:20:24.231Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-08T06:20:30.120Z"}
+{"level":"info","message":"🚀 Initializing Polygon Arbitrage Bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.153Z"}
+{"level":"info","message":"📊 Connecting to database...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.154Z"}
+{"level":"info","message":"✅ Database connected","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.220Z"}
+{"level":"warn","message":"Ledger not initialized:","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.221Z"}
+{"level":"info","message":"🌐 Initializing blockchain providers...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.221Z"}
+{"level":"info","message":"✅ Providers initialized","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.221Z"}
+{"level":"info","message":"💰 Verifying wallet...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.221Z"}
+{"level":"info","message":"📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.643Z"}
+{"level":"info","message":"💎 MATIC Balance: 0.0","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.643Z"}
+{"level":"info","message":"✅ Wallet verified","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.644Z"}
+{"level":"info","message":"📜 Checking smart contract...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.644Z"}
+{"level":"warn","message":"⚠️  Contract manager not available - skipping contract verification","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.644Z"}
+{"level":"info","message":"🔧 Starting services...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.645Z"}
+{"level":"info","message":"✅ Metrics service started","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.653Z"}
+{"level":"info","message":"✅ Health API started","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.654Z"}
+{"level":"info","message":"✅ Market watcher initialized","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.656Z"}
+{"level":"info","message":"✨ Initialization complete!","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.656Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.656Z"}
+{"level":"info","message":"📈 Current Status:","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"Mode: live","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"Circuit Breaker: 🟢 OK","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"Daily P&L: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"Daily Trades: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"Enabled DEXes: sushiswap, uniswapv3, quickswap","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"────────────────────────────────────────","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"🏁 Starting arbitrage bot...","service":"main-orchestrator","timestamp":"2025-10-08T06:20:46.657Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.840Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.840Z"}
+{"level":"info","message":"🤖 POLYGON ARBITRAGE BOT IS RUNNING","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.841Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.841Z"}
+{"level":"info","message":"Mode: LIVE","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.841Z"}
+{"level":"info","message":"Time: 2025-10-08T06:21:06.841Z","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.841Z"}
+{"level":"info","message":"============================================================","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.841Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:21:06.842Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:22:06.843Z"}
+{"level":"info","message":"📊 Status Update (1 min uptime)","service":"main-orchestrator","timestamp":"2025-10-08T06:22:06.843Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:22:06.843Z"}
+{"level":"info","message":"Memory: 35.02 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:22:06.844Z"}
+{"level":"info","message":"","service":"main-orchestrator","timestamp":"2025-10-08T06:23:06.844Z"}
+{"level":"info","message":"📊 Status Update (2 min uptime)","service":"main-orchestrator","timestamp":"2025-10-08T06:23:06.844Z"}
+{"level":"info","message":"Opportunities: 0 | Trades: 0 | Profit: $0.00","service":"main-orchestrator","timestamp":"2025-10-08T06:23:06.844Z"}
+{"level":"info","message":"Memory: 28.64 MB | Queue: 0","service":"main-orchestrator","timestamp":"2025-10-08T06:23:06.844Z"}
+{"level":"info","message":"Received SIGINT","service":"main-orchestrator","timestamp":"2025-10-08T06:23:13.280Z"}

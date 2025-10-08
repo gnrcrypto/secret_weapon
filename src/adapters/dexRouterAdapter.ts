@@ -6,7 +6,10 @@ import {
   interfaces,
   POLYGON_ADDRESSES,
   getRouterInterface,
-  ERC20_ABI
+  ERC20_ABI,
+  // Make sure these are exported in ../utils/abi
+  CURVE_POOL_ABI,
+  // CURVE_ROUTER_ABI,  <-- removed because it was unused
 } from '../utils/abi';
 import {
   fromWei,
@@ -34,6 +37,7 @@ export interface DexConfig {
   initCodeHash?: string;
   fee: number; // in basis points (30 = 0.3%)
   isV3?: boolean;
+  isCurve?: boolean;
 }
 
 // Token information
@@ -99,6 +103,13 @@ const DEX_CONFIGS: Record<string, DexConfig> = {
     fee: 30, // Variable fees in V3 (0.05%, 0.3%, 1%)
     isV3: true,
   },
+  curveswap: {
+    name: 'CurveSwap',
+    router: '0x0DCDED3545D565bA3B19E683431381007245d983', // Curve Router on Polygon
+    factory: '', // Curve doesn't use factory in the same way
+    fee: 4, // 0.04% fee for stable pools
+    isCurve: true,
+  },
 };
 
 /**
@@ -108,6 +119,15 @@ export class DexAdapter {
   protected contract: Contract;
   protected factoryContract: Contract | null = null;
   protected routerInterface: Interface;
+
+  // Minimal local Curve pool registry (lowercase tokenA_tokenB keys). Populate as needed.
+  private static CURVE_POOL_REGISTRY: Record<string, string> = {
+    // Example entries (replace with real Polygon pool addresses)
+    // '0x2791bca1..._0xc2132d05...': '0x45b783...'
+  };
+
+  // Uniswap V3 Quoter address (Polygon): keep as constant used for quoting
+  private static UNISWAP_V3_QUOTER = '0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6';
 
   constructor(
     protected config: DexConfig,
@@ -121,7 +141,7 @@ export class DexAdapter {
       signer || provider
     );
 
-    if (config.factory && !config.isV3) {
+    if (config.factory && !config.isV3 && !config.isCurve) {
       this.factoryContract = new Contract(
         config.factory,
         interfaces.UniswapV2Factory,
@@ -140,6 +160,11 @@ export class DexAdapter {
         return this.getAmountsOutV3(path, amountIn);
       }
 
+      if (this.config.isCurve) {
+        // Curve requires different handling
+        return this.getAmountsOutCurve(path, amountIn);
+      }
+
       const amounts = await this.contract.getAmountsOut(amountIn, path);
       return amounts.map((a: any) => BigInt(a.toString()));
     } catch (error) {
@@ -156,6 +181,11 @@ export class DexAdapter {
       if (this.config.isV3) {
         // V3 requires different handling
         return this.getAmountsInV3(path, amountOut);
+      }
+
+      if (this.config.isCurve) {
+        // Curve requires different handling
+        return this.getAmountsInCurve(path, amountOut);
       }
 
       const amounts = await this.contract.getAmountsIn(amountOut, path);
@@ -181,6 +211,10 @@ export class DexAdapter {
 
     if (this.config.isV3) {
       return this.buildSwapTxV3(params);
+    }
+
+    if (this.config.isCurve) {
+      return this.buildSwapTxCurve(params);
     }
 
     // Build path
@@ -275,6 +309,11 @@ export class DexAdapter {
    * Get pair address for two tokens
    */
   async getPairAddress(tokenA: string, tokenB: string): Promise<string | null> {
+    if (this.config.isCurve || this.config.isV3) {
+      // Curve and V3 don't use factory pattern in the same way
+      return null;
+    }
+
     if (!this.factoryContract) return null;
 
     try {
@@ -290,6 +329,11 @@ export class DexAdapter {
    * Get reserves for a pair
    */
   async getReserves(tokenA: string, tokenB: string): Promise<{ reserve0: bigint; reserve1: bigint } | null> {
+    if (this.config.isCurve || this.config.isV3) {
+      // Curve and V3 have different reserve mechanisms
+      return null;
+    }
+
     const pairAddress = await this.getPairAddress(tokenA, tokenB);
     if (!pairAddress) return null;
 
@@ -315,21 +359,238 @@ export class DexAdapter {
     }
   }
 
+  // Helper: normalize pair key
+  private pairKey(a: string, b: string): string {
+    const A = a.toLowerCase();
+    const B = b.toLowerCase();
+    return `${A}_${B}`;
+  }
+
+  /**
+   * Find pool address for token pair.
+   * - First tries local registry CURVE_POOL_REGISTRY
+   * - If not found, returns null (you can extend to probe/poll candidates)
+   */
+  private async findPoolAddress(tokenA: string, tokenB: string): Promise<string | null> {
+    const k1 = this.pairKey(tokenA, tokenB);
+    const k2 = this.pairKey(tokenB, tokenA);
+    if ((DexAdapter.CURVE_POOL_REGISTRY as any)[k1]) return (DexAdapter.CURVE_POOL_REGISTRY as any)[k1];
+    if ((DexAdapter.CURVE_POOL_REGISTRY as any)[k2]) return (DexAdapter.CURVE_POOL_REGISTRY as any)[k2];
+
+    // Optionally implement probing logic here (expensive RPC calls)
+    return null;
+  }
+
+  /**
+   * Get token index for tokenAddress in poolAddress
+   */
+  private async getTokenIndex(poolAddress: string, tokenAddress: string): Promise<number> {
+    const poolContract = new Contract(poolAddress, CURVE_POOL_ABI, this.provider);
+
+    // Try coin_count (newer pools)
+    try {
+      const countRaw: any = await poolContract.coin_count?.();
+      const coinCount = countRaw ? Number(countRaw.toString()) : null;
+      if (coinCount && coinCount > 0) {
+        for (let i = 0; i < coinCount; i++) {
+          try {
+            const coin = await poolContract.coins(i);
+            if (coin && coin.toLowerCase() === tokenAddress.toLowerCase()) return i;
+          } catch {
+            // ignore iteration failures
+          }
+        }
+      }
+    } catch {
+      // ignore and fallback to brute force
+    }
+
+    // Fallback: try up to 8 coins
+    for (let i = 0; i < 8; i++) {
+      try {
+        const coin = await poolContract.coins(i);
+        if (coin && coin.toLowerCase() === tokenAddress.toLowerCase()) return i;
+      } catch {
+        break;
+      }
+    }
+
+    throw new Error(`Token ${tokenAddress} not found in pool ${poolAddress}`);
+  }
+
+  // Curve specific methods
+  private async getAmountsOutCurve(path: string[], amountIn: bigint): Promise<bigint[]> {
+    try {
+      const [tokenIn, tokenOut] = path;
+
+      // 1) Try to find direct pool
+      const poolAddress = await this.findPoolAddress(tokenIn, tokenOut);
+
+      // If pool found, prefer pool-level quoting
+      if (poolAddress) {
+        try {
+          const tokenInIndex = await this.getTokenIndex(poolAddress, tokenIn);
+          const tokenOutIndex = await this.getTokenIndex(poolAddress, tokenOut);
+
+          const poolContract = new Contract(poolAddress, CURVE_POOL_ABI, this.provider);
+
+          // Prefer underlying variant when available (meta pools)
+          if (typeof poolContract.get_dy_underlying === 'function') {
+            const dy = await poolContract.get_dy_underlying(tokenInIndex, tokenOutIndex, amountIn);
+            return [amountIn, BigInt(dy.toString())];
+          }
+
+          if (typeof poolContract.get_dy === 'function') {
+            const dy = await poolContract.get_dy(tokenInIndex, tokenOutIndex, amountIn);
+            return [amountIn, BigInt(dy.toString())];
+          }
+        } catch (err) {
+          logger.debug('Pool-level quote failed, falling back to heuristic', err);
+        }
+      }
+
+      // 2) Heuristic fallback only
+      logger.warn('Curve pool quote not available on-chain for this pair, returning estimate');
+      const isStablePair = this.isStablecoinPair(tokenIn, tokenOut);
+      const feeMultiplier = isStablePair ? BigInt(9996) : BigInt(9970); // 0.04% vs 0.3% fee
+      return [amountIn, (amountIn * feeMultiplier) / BigInt(10000)];
+    } catch (error) {
+      logger.error(`Error getting Curve amounts out:`, error);
+      throw error;
+    }
+  }
+
+  private async getAmountsInCurve(path: string[], amountOut: bigint): Promise<bigint[]> {
+    try {
+      const [tokenIn, tokenOut] = path;
+
+      // 1) Try pool-level
+      const poolAddress = await this.findPoolAddress(tokenIn, tokenOut);
+      if (poolAddress) {
+        try {
+          const tokenInIndex = await this.getTokenIndex(poolAddress, tokenIn);
+          const tokenOutIndex = await this.getTokenIndex(poolAddress, tokenOut);
+
+          const poolContract = new Contract(poolAddress, CURVE_POOL_ABI, this.provider);
+
+          if (typeof poolContract.get_dx_underlying === 'function') {
+            const dx = await poolContract.get_dx_underlying(tokenInIndex, tokenOutIndex, amountOut);
+            return [BigInt(dx.toString()), amountOut];
+          }
+
+          if (typeof poolContract.get_dx === 'function') {
+            const dx = await poolContract.get_dx(tokenInIndex, tokenOutIndex, amountOut);
+            return [BigInt(dx.toString()), amountOut];
+          }
+        } catch (err) {
+          logger.debug('Pool-level get_dx failed, falling back to heuristic', err);
+        }
+      }
+
+      // 2) Fallback heuristic
+      logger.warn('Curve getAmountsIn not available on-chain for this pair, returning estimate');
+      const isStablePair = this.isStablecoinPair(tokenIn, tokenOut);
+      const feeMultiplier = isStablePair ? BigInt(10004) : BigInt(10030); // inverse multipliers
+      return [(amountOut * feeMultiplier) / BigInt(10000), amountOut];
+    } catch (error) {
+      logger.error(`Error getting Curve amounts in:`, error);
+      throw error;
+    }
+  }
+
+  private async buildSwapTxCurve(params: SwapParams): Promise<any> {
+    const {
+      tokenIn,
+      tokenOut,
+      amountIn,
+      amountOutMin,
+    } = params;
+
+    // POOL-ONLY behavior: require a specific pool and build a pool-level exchange tx.
+    const poolAddress = await this.findPoolAddress(tokenIn, tokenOut);
+    if (!poolAddress) {
+      logger.error(`No Curve pool found for ${tokenIn}/${tokenOut} (pool-only mode)`);
+      throw new Error(`No Curve pool found for ${tokenIn}/${tokenOut}`);
+    }
+
+    try {
+      const tokenInIndex = await this.getTokenIndex(poolAddress, tokenIn);
+      const tokenOutIndex = await this.getTokenIndex(poolAddress, tokenOut);
+      const poolContract = new Contract(poolAddress, CURVE_POOL_ABI, this.signer || this.provider);
+
+      if (this.signer && typeof poolContract.exchange_underlying === 'function') {
+        const data = poolContract.interface.encodeFunctionData('exchange_underlying', [
+          tokenInIndex,
+          tokenOutIndex,
+          amountIn,
+          amountOutMin
+        ]);
+        return { to: poolAddress, data, value: BigInt(0) };
+      }
+
+      if (this.signer && typeof poolContract.exchange === 'function') {
+        const data = poolContract.interface.encodeFunctionData('exchange', [
+          tokenInIndex,
+          tokenOutIndex,
+          amountIn,
+          amountOutMin
+        ]);
+        return { to: poolAddress, data, value: BigInt(0) };
+      }
+
+      logger.error('Pool found but no exchange method available on pool contract');
+      throw new Error('Pool found but no exchange method available on pool contract');
+    } catch (err) {
+      logger.error('Pool-level exchange encoding failed', err);
+      throw err;
+    }
+  }
+
+  private isStablecoinPair(tokenA: string, tokenB: string): boolean {
+    const stablecoins = [
+      ADDRESSES.USDC.toLowerCase(),
+      ADDRESSES.USDT.toLowerCase(),
+      ADDRESSES.DAI.toLowerCase(),
+    ];
+
+    return stablecoins.includes(tokenA.toLowerCase()) &&
+           stablecoins.includes(tokenB.toLowerCase());
+  }
+
   // V3 specific methods
   private async getAmountsOutV3(_path: string[], amountIn: bigint): Promise<bigint[]> {
-    // Simplified V3 quote - in production, use Quoter contract
-    logger.warn('V3 quotes not fully implemented, returning estimate');
-    return [amountIn, amountIn * BigInt(997) / BigInt(1000)]; // 0.3% fee estimate
+    try {
+      const [tokenIn, tokenOut] = _path;
+      // Use on-chain Quoter contract for accurate quote
+      const quoterAbi = ['function quoteExactInputSingle(address,address,uint24,uint256,uint160) external returns (uint256)'];
+      const quoter = new Contract(DexAdapter.UNISWAP_V3_QUOTER, quoterAbi, this.provider);
+      const fee = 3000; // default to 0.3% tier; you can adjust externally per pool
+      const quoted = await (quoter.callStatic as any).quoteExactInputSingle(tokenIn, tokenOut, fee, amountIn, 0);
+      return [amountIn, BigInt(quoted.toString())];
+    } catch (err) {
+      logger.warn('V3 quoter failed, falling back to simple estimate', err);
+      // Fallback: approximate 0.3% fee
+      return [amountIn, amountIn * BigInt(997) / BigInt(1000)];
+    }
   }
 
   private async getAmountsInV3(_path: string[], amountOut: bigint): Promise<bigint[]> {
-    // Simplified V3 quote - in production, use Quoter contract
-    logger.warn('V3 quotes not fully implemented, returning estimate');
-    return [amountOut * BigInt(1003) / BigInt(1000), amountOut]; // 0.3% fee estimate
+    try {
+      const [tokenIn, tokenOut] = _path;
+      const quoterAbi = ['function quoteExactOutputSingle(address,address,uint24,uint256,uint160) external returns (uint256)'];
+      const quoter = new Contract(DexAdapter.UNISWAP_V3_QUOTER, quoterAbi, this.provider);
+      const fee = 3000; // default to 0.3% tier
+      const quotedIn = await (quoter.callStatic as any).quoteExactOutputSingle(tokenIn, tokenOut, fee, amountOut, 0);
+      return [BigInt(quotedIn.toString()), amountOut];
+    } catch (err) {
+      logger.warn('V3 quoter failed (in), falling back to simple estimate', err);
+      // Fallback: approximate 0.3% fee
+      return [amountOut * BigInt(1003) / BigInt(1000), amountOut];
+    }
   }
 
   private buildSwapTxV3(params: SwapParams): any {
-    // Simplified V3 swap - in production, handle all swap types
+    // Simplified V3 swap - in production, handle fee selection and path building
     const swapParams = {
       tokenIn: params.tokenIn,
       tokenOut: params.tokenOut,

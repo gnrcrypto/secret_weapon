@@ -1,4 +1,4 @@
-export type DexName = 'quickswap' | 'sushiswap' | 'uniswapv3';
+export type DexName = 'quickswap' | 'sushiswap' | 'uniswapv3' | 'curveswap';
 declare const rawConfig: {
     network: {
         rpcUrl: string;
@@ -45,6 +45,7 @@ declare const rawConfig: {
         quickswapRouter: string;
         sushiswapRouter: string;
         uniswapV3Router: string;
+        curveswapRouter: string;
     };
     database: {
         host: string;
@@ -110,6 +111,9 @@ export declare const ADDRESSES: {
     readonly USDT: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
     readonly DAI: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
     readonly WETH: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
+    readonly LINK: "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBd39c";
+    readonly AAVE: "0xD6DF932A45C0f255f85a35A5aF1F2b5B18390d62";
+    readonly UNI: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
     readonly WBTC: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6";
     readonly AAVE_LENDING_POOL: "0x794a61358D6845594F94dc1DB02A252b5b4814aD";
     readonly BALANCER_VAULT: "0xBA12222222228d8Ba445958a75a0704d566BF2C8";
@@ -117,6 +121,7 @@ export declare const ADDRESSES: {
         readonly QUICKSWAP: any;
         readonly SUSHISWAP: any;
         readonly UNISWAPV3: any;
+        readonly CURVESWAP: any;
     };
 };
 export declare const NETWORK: {

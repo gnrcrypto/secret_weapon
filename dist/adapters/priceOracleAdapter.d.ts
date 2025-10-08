@@ -2,8 +2,10 @@ import { JsonRpcProvider } from 'ethers';
 export interface PriceData {
     price: number;
     timestamp: number;
-    source: 'chainlink' | 'dex' | 'aggregated';
+    source: 'chainlink' | 'dex' | 'aggregated' | 'fallback';
     confidence?: number;
+    sources?: string[];
+    deviation?: number;
     roundId?: string;
 }
 export interface TokenPairPrice {
@@ -19,12 +21,25 @@ export declare class PriceOracleAdapter {
     private chainlinkContracts;
     private priceUpdateListeners;
     private lastPrices;
+    private dexPriceCache;
     constructor(provider: JsonRpcProvider);
     private initializeOracles;
     /**
      * Start background price updates for critical pairs
      */
     private startPriceUpdates;
+    /**
+     * Update DEX prices for a given pair
+     */
+    private updateDexPrices;
+    /**
+     * Aggregate multiple price sources
+     */
+    private aggregatePrices;
+    /**
+     * Convert Chainlink pair to token addresses
+     */
+    private convertPairToTokens;
     /**
      * Get Chainlink price with improved error handling and staleness checks
      */
@@ -34,7 +49,11 @@ export declare class PriceOracleAdapter {
      */
     getDexPrice(tokenA: string, tokenB: string): Promise<PriceData | null>;
     /**
-     * Get live token price in USD with best available source
+     * Get stablecoin price with slight variance
+     */
+    private getStablecoinPrice;
+    /**
+     * Enhanced token price fetching with multi-source fallback
      */
     getTokenPriceUSD(tokenSymbolOrAddress: string): Promise<number | null>;
     /**
@@ -57,7 +76,15 @@ export declare class PriceOracleAdapter {
      * Get health status of all oracles
      */
     getOracleHealth(): Record<string, any>;
+    /**
+     * Method to get all available price sources for a token
+     */
+    getPriceSources(tokenSymbolOrAddress: string): Promise<PriceData[]>;
     clearCache(): void;
+    /**
+     * Additional method to clear all caches
+     */
+    clearCaches(): void;
     getCacheStats(): object;
     /**
      * Cleanup background tasks

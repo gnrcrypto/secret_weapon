@@ -68,6 +68,48 @@ export const UNISWAP_V3_ROUTER_ABI = [
   'function exactOutput(tuple(bytes path, address recipient, uint256 deadline, uint256 amountOut, uint256 amountInMaximum) params) payable returns (uint256 amountIn)',
 ];
 
+export const CURVE_ROUTER_ABI = [
+  'function exchange(address _pool, address _from, address _to, uint256 _amount, uint256 _expected, address _receiver) payable returns (uint256)',
+  'function exchange(address _pool, int128 i, int128 j, uint256 dx, uint256 min_dy) payable returns (uint256)',
+  'function exchange_multiple(address[9] _route, uint256[3][4] _swap_params, uint256 _amount, uint256 _expected, address[4] _pools, address _receiver) payable returns (uint256)',
+  'function get_dy(address _pool, address _from, address _to, uint256 _amount) view returns (uint256)',
+  'function get_dy(address _pool, int128 i, int128 j, uint256 dx) view returns (uint256)',
+  'function get_best_rate(address _from, address _to, uint256 _amount) view returns (address, uint256)',
+  'function get_exchange_amount(address _pool, address _from, address _to, uint256 _amount) view returns (uint256)',
+  'function get_input_amount(address _pool, address _from, address _to, uint256 _amount) view returns (uint256)',
+  'function get_exchanges() view returns (address[])',
+];
+
+export const CURVE_POOL_ABI = [
+  'function coins(uint256 i) view returns (address)',
+  'function balances(uint256 i) view returns (uint256)',
+  'function get_virtual_price() view returns (uint256)',
+  'function calc_token_amount(uint256[2] amounts, bool deposit) view returns (uint256)',
+  'function add_liquidity(uint256[2] amounts, uint256 min_mint_amount) payable returns (uint256)',
+  'function remove_liquidity(uint256 _amount, uint256[2] min_amounts) returns (uint256[2])',
+  'function remove_liquidity_one_coin(uint256 _token_amount, int128 i, uint256 min_amount) returns (uint256)',
+  'function get_dy(int128 i, int128 j, uint256 dx) view returns (uint256)',
+  'function exchange(int128 i, int128 j, uint256 dx, uint256 min_dy) payable returns (uint256)',
+  'function A() view returns (uint256)',
+  'function fee() view returns (uint256)',
+  'function admin_fee() view returns (uint256)',
+  'function initial_A() view returns (uint256)',
+  'function future_A() view returns (uint256)',
+  'function initial_A_time() view returns (uint256)',
+  'function future_A_time() view returns (uint256)',
+  'function admin_balances(uint256 i) view returns (uint256)',
+  'function owner() view returns (address)',
+  'function token() view returns (address)',
+  'function base_pool() view returns (address)',
+  'function calc_withdraw_one_coin(uint256 _token_amount, int128 i) view returns (uint256)',
+  'event TokenExchange(address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought)',
+  'event AddLiquidity(address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 invariant, uint256 token_supply)',
+  'event RemoveLiquidity(address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 token_supply)',
+  'event RemoveLiquidityOne(address indexed provider, uint256 token_amount, uint256 coin_amount)',
+  'event CommitNewParameters(uint256 deadline, address admin, uint256 A, uint256 fee)',
+  'event NewParameters(uint256 A, uint256 fee)',
+];
+
 export const AAVE_LENDING_POOL_ABI = [
   'function flashLoan(address receiverAddress, address[] assets, uint256[] amounts, uint256[] modes, address onBehalfOf, bytes params, uint16 referralCode)',
   'function deposit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode)',
@@ -114,6 +156,8 @@ export const interfaces = {
   UniswapV2Pair: new Interface(UNISWAP_V2_PAIR_ABI),
   UniswapV2Factory: new Interface(UNISWAP_V2_FACTORY_ABI),
   UniswapV3Router: new Interface(UNISWAP_V3_ROUTER_ABI),
+  CurveRouter: new Interface(CURVE_ROUTER_ABI),
+  CurvePool: new Interface(CURVE_POOL_ABI),
   AaveLendingPool: new Interface(AAVE_LENDING_POOL_ABI),
   BalancerVault: new Interface(BALANCER_VAULT_ABI),
   Multicall: new Interface(MULTICALL_ABI),
@@ -203,15 +247,23 @@ export const POLYGON_ADDRESSES = {
   DAI: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
   WETH: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
   WBTC: '0x1bFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+  LINK: '0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39',
+  AAVE: '0xD6DF932A45C0f255f85145f286eA0b292B21C90B',
+  UNI: '0xb33EaAd8d922B1083446DC23f610c2567fB5180f',
 
   // DEX Routers
   QUICKSWAP_ROUTER: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff',
   SUSHISWAP_ROUTER: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
   UNISWAPV3_ROUTER: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
+  CURVESWAP_ROUTER: '0x0DCDED3545D565bA3B19E683431381007245d983',
 
   // DEX Factories
   QUICKSWAP_FACTORY: '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
   SUSHISWAP_FACTORY: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+
+  // Curve Pools (common stablecoin pools)
+  CURVE_USDC_USDT_POOL: '0x3A6f6B3a8E6c2527Bf6cE9316c17b9BEA7E73B4a',
+  CURVE_DAI_USDC_POOL: '0x3A6f6B3a8E6c2527Bf6cE9316c17b9BEA7E73B4a',
 
   // Lending
   AAVE_LENDING_POOL: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
@@ -228,6 +280,12 @@ export const POLYGON_ADDRESSES = {
   CHAINLINK_ETH_USD: '0xF9680D99D6C9589e2a93a78A04A279e509205945',
   CHAINLINK_BTC_USD: '0xc907E116054Ad103354f2D350FD2514433D57F6f',
   CHAINLINK_USDC_USD: '0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7',
+  CHAINLINK_AAVE_USD: '0x72484B12719E23115761D5DA1646945632979bB6',
+  CHAINLINK_ADA_USD: '0x882554df528115a743c4537828DA8D5B58e52544',
+  CHAINLINK_ALGO_USD: '0x03Bc6D9EFed65708D35fDaEfb25E87631a0a3437',
+  CHAINLINK_APE_USD: '0x2Ac3F3Bfac8fC9094BC3f0F9041a51375235B992',
+  CHAINLINK_AVAX_USD: '0xe01eA2fbd8D76ee323FbEd03eB9a8625EC981A10',
+  CHAINLINK_BNB_USD: '0x82a6c4AF830caa6c97bb504425f6A66165C2c26e',
 } as const;
 
 /**
@@ -238,6 +296,10 @@ export function getRouterInterface(dexName: string): Interface {
 
   if (normalizedName.includes('v3')) {
     return interfaces.UniswapV3Router;
+  }
+
+  if (normalizedName.includes('curve')) {
+    return interfaces.CurveRouter;
   }
 
   // Most DEXs use UniswapV2 compatible routers
@@ -291,3 +353,5 @@ export type RouterInterface = typeof interfaces.UniswapV2Router;
 export type PairInterface = typeof interfaces.UniswapV2Pair;
 export type FactoryInterface = typeof interfaces.UniswapV2Factory;
 export type ERC20Interface = typeof interfaces.ERC20;
+export type CurveRouterInterface = typeof interfaces.CurveRouter;
+export type CurvePoolInterface = typeof interfaces.CurvePool;

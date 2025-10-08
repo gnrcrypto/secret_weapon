@@ -51,7 +51,7 @@ const configSchema = joi_1.default.object({
     }),
     // Then update the dex schema:
     dex: joi_1.default.object({
-        enabledDexes: joi_1.default.array().items(joi_1.default.string().valid('quickswap', 'sushiswap', 'uniswapv3')).min(1).required(),
+        enabledDexes: joi_1.default.array().items(joi_1.default.string().valid('quickswap', 'sushiswap', 'uniswapv3', 'curveswap')).min(1).required(),
         quickswapRouter: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
         sushiswapRouter: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
         uniswapV3Router: joi_1.default.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(), // Changed from optional to required
@@ -128,7 +128,7 @@ const rawConfig = {
         rpcUrl: process.env.RPC_URL_POLYGON,
         rpcUrlBackup: process.env.RPC_URL_POLYGON_BACKUP,
         chainId: parseInt(process.env.CHAIN_ID || '137'),
-        blockPollingInterval: parseInt(process.env.BLOCK_POLLING_INTERVAL_MS || '100'),
+        blockPollingInterval: parseInt(process.env.BLOCK_POLLING_INTERVAL_MS || '1000'),
     },
     wallet: {
         privateKey: process.env.PRIVATE_KEY,
@@ -152,23 +152,24 @@ const rawConfig = {
     execution: {
         mode: process.env.EXECUTOR_MODE,
         slippageBps: parseInt(process.env.SLIPPAGE_BPS || '50'),
-        minProfitThresholdUsd: parseFloat(process.env.MIN_PROFIT_THRESHOLD_USD || '5'),
-        maxTradeSizeUsd: parseFloat(process.env.MAX_TRADE_SIZE_USD || '10000'),
-        tradeCapPerTx: parseFloat(process.env.TRADE_CAP_PER_TX || '5000'),
+        minProfitThresholdUsd: parseFloat(process.env.MIN_PROFIT_THRESHOLD_USD || '0.1'),
+        maxTradeSizeUsd: parseFloat(process.env.MAX_TRADE_SIZE_USD || '100000'),
+        tradeCapPerTx: parseFloat(process.env.TRADE_CAP_PER_TX || '50000'),
         maxPositionSizeUsd: parseFloat(process.env.MAX_POSITION_SIZE_USD || '50000'),
         txDeadlineSeconds: parseInt(process.env.TX_DEADLINE_SECONDS || '1200'),
     },
     flashloan: {
         enabled: process.env.ENABLE_FLASHLOANS === 'true',
         provider: process.env.FLASHLOAN_PROVIDER,
-        maxFlashloanUsd: parseFloat(process.env.MAX_FLASHLOAN_USD || '100000'),
-        flashloanFeeBps: parseFloat(process.env.FLASHLOAN_FEE_BPS || '9'),
+        maxFlashloanUsd: parseFloat(process.env.MAX_FLASHLOAN_USD || '1000000'),
+        flashloanFeeBps: parseFloat(process.env.FLASHLOAN_FEE_BPS || '0'),
     },
     dex: {
-        enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap', 'sushiswap', 'uniswapv3'], // Default to all three
+        enabledDexes: process.env.ENABLED_DEXES?.split(',') || ['quickswap', 'sushiswap', 'uniswapv3', 'curveswap'], // Default to all three
         quickswapRouter: process.env.QUICKSWAP_ROUTER,
         sushiswapRouter: process.env.SUSHISWAP_ROUTER,
         uniswapV3Router: process.env.UNISWAPV3_ROUTER, // Changed from optional to required
+        curveswapRouter: process.env.CURVESWAP_ROUTER,
     },
     database: {
         host: process.env.DB_HOST || 'localhost',
@@ -208,23 +209,23 @@ const rawConfig = {
     performance: {
         priceCacheTtlMs: parseInt(process.env.PRICE_CACHE_TTL_MS || '500'),
         pathCacheTtlMs: parseInt(process.env.PATH_CACHE_TTL_MS || '5000'),
-        maxConcurrentSimulations: parseInt(process.env.MAX_CONCURRENT_SIMULATIONS || '10'),
-        workerPoolSize: parseInt(process.env.WORKER_POOL_SIZE || '4'),
+        maxConcurrentSimulations: parseInt(process.env.MAX_CONCURRENT_SIMULATIONS || '2'),
+        workerPoolSize: parseInt(process.env.WORKER_POOL_SIZE || '2'),
     },
     security: {
         apiKeyHeader: process.env.API_KEY_HEADER || 'X-API-KEY',
         apiKey: process.env.API_KEY,
-        enableReplayProtection: process.env.ENABLE_REPLAY_PROTECTION === 'true',
+        enableReplayProtection: process.env.ENABLE_REPLAY_PROTECTION === 'false',
         nonceManagerType: process.env.NONCE_MANAGER_TYPE,
     },
     features: {
         enableTriangularArb: process.env.ENABLE_TRIANGULAR_ARB === 'true',
         enableCrossDexArb: process.env.ENABLE_CROSS_DEX_ARB === 'true',
-        enableMevProtection: process.env.ENABLE_MEV_PROTECTION === 'true',
-        enableSandwichProtection: process.env.ENABLE_SANDWICH_PROTECTION === 'true',
+        enableMevProtection: process.env.ENABLE_MEV_PROTECTION === 'false',
+        enableSandwichProtection: process.env.ENABLE_SANDWICH_PROTECTION === 'false',
     },
     workers: {
-        poolSize: parseInt(process.env.WORKER_POOL_SIZE || '4'),
+        poolSize: parseInt(process.env.WORKER_POOL_SIZE || '2'),
     },
 };
 // Validate configuration
@@ -246,6 +247,9 @@ exports.ADDRESSES = {
     USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
     DAI: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
     WETH: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+    LINK: '0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBd39c',
+    AAVE: '0xD6DF932A45C0f255f85a35A5aF1F2b5B18390d62',
+    UNI: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
     WBTC: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
     AAVE_LENDING_POOL: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
     BALANCER_VAULT: '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
@@ -253,6 +257,7 @@ exports.ADDRESSES = {
         QUICKSWAP: validatedConfig.dex.quickswapRouter,
         SUSHISWAP: validatedConfig.dex.sushiswapRouter,
         UNISWAPV3: validatedConfig.dex.uniswapV3Router,
+        CURVESWAP: validatedConfig.dex.curveswapRouter,
     },
 };
 exports.NETWORK = {

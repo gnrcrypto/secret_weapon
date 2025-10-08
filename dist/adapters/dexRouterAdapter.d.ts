@@ -6,6 +6,7 @@ export interface DexConfig {
     initCodeHash?: string;
     fee: number;
     isV3?: boolean;
+    isCurve?: boolean;
 }
 export interface TokenInfo {
     address: string;
@@ -47,6 +48,8 @@ export declare class DexAdapter {
     protected contract: Contract;
     protected factoryContract: Contract | null;
     protected routerInterface: Interface;
+    private static CURVE_POOL_REGISTRY;
+    private static UNISWAP_V3_QUOTER;
     constructor(config: DexConfig, provider: JsonRpcProvider, signer?: Wallet | undefined);
     /**
      * Get amounts out for a swap path
@@ -79,6 +82,21 @@ export declare class DexAdapter {
         reserve0: bigint;
         reserve1: bigint;
     } | null>;
+    private pairKey;
+    /**
+     * Find pool address for token pair.
+     * - First tries local registry CURVE_POOL_REGISTRY
+     * - If not found, returns null (you can extend to probe/poll candidates)
+     */
+    private findPoolAddress;
+    /**
+     * Get token index for tokenAddress in poolAddress
+     */
+    private getTokenIndex;
+    private getAmountsOutCurve;
+    private getAmountsInCurve;
+    private buildSwapTxCurve;
+    private isStablecoinPair;
     private getAmountsOutV3;
     private getAmountsInV3;
     private buildSwapTxV3;
