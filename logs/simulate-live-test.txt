@@ -1,0 +1,251 @@
+EXECUTOR_MODE=simulate npm start
+
+> polygon-arbitrage-bot@1.0.0 start
+> node dist/main.js
+
+2025-10-08T06:17:10.571Z [info]: 🚀 Initializing Polygon Arbitrage Bot...
+2025-10-08T06:17:10.573Z [info]: 📊 Connecting to database...
+query: SELECT version()
+query: SELECT * FROM current_schema()
+query: START TRANSACTION
+query: SELECT * FROM "information_schema"."tables" WHERE "table_schema" = 'public' AND "table_name" = 'typeorm_metadata'
+query: COMMIT
+2025-10-08T06:17:10.657Z [info]: ✅ Database connected
+2025-10-08T06:17:10.657Z [warn]: Ledger not initialized:
+2025-10-08T06:17:10.657Z [info]: 🌐 Initializing blockchain providers...
+error: No healthy providers available!
+info: Provider manager initialized
+2025-10-08T06:17:10.661Z [info]: ✅ Providers initialized
+2025-10-08T06:17:10.662Z [info]: 📝 Running in SIMULATION mode - no real trades
+2025-10-08T06:17:10.662Z [info]: 📝 Simulation mode - skipping contract check
+2025-10-08T06:17:10.662Z [info]: 🔧 Starting services...
+2025-10-08T06:17:10.670Z [info]: ✅ Metrics service started
+2025-10-08T06:17:10.672Z [info]: ✅ Health API started
+info: Daily metrics will reset in 1063 minutes {"service":"risk-manager"}
+2025-10-08T06:17:10.673Z [info]: ✅ Market watcher initialized
+2025-10-08T06:17:10.673Z [info]: ✨ Initialization complete!
+2025-10-08T06:17:10.674Z [info]:
+2025-10-08T06:17:10.674Z [info]: 📈 Current Status:
+2025-10-08T06:17:10.674Z [info]: ────────────────────────────────────────
+2025-10-08T06:17:10.674Z [info]: Mode: simulate
+2025-10-08T06:17:10.674Z [info]: Circuit Breaker: 🟢 OK
+2025-10-08T06:17:10.674Z [info]: Daily P&L: $0.00
+2025-10-08T06:17:10.675Z [info]: Daily Trades: 0
+2025-10-08T06:17:10.675Z [info]: Enabled DEXes: sushiswap, uniswapv3, quickswap
+2025-10-08T06:17:10.675Z [info]: ────────────────────────────────────────
+2025-10-08T06:17:10.675Z [info]:
+2025-10-08T06:17:10.675Z [info]: 🏁 Starting arbitrage bot...
+info: Starting market watcher... {"service":"market-watcher"}
+info: Initializing pathfinder token graph... {"service":"pathfinder"}
+error: No healthy providers available!
+warn: No healthy providers, using primary provider
+info: Initialized SushiSwap adapter {"service":"dex-router-adapter"}
+info: Initialized UniswapV3 adapter {"service":"dex-router-adapter"}
+info: Initialized QuickSwap adapter {"service":"dex-router-adapter"}
+info: Checking 6 tokens across 3 DEXs {"service":"pathfinder"}
+info: Scanning sushiswap for pairs... {"service":"pathfinder"}
+info: Metrics server started on port 9090 {"service":"metrics"}
+info: Prometheus metrics available at http://localhost:9090/metrics {"service":"metrics"}
+info: Health API started on port 3000 {"service":"health-api"}
+info: Health check: http://localhost:3000/health {"service":"health-api"}
+debug: Added WMATIC-USDC on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-USDT on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-DAI on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-WETH on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added USDC-USDT on sushiswap {"service":"pathfinder"}
+debug: Added USDC-DAI on sushiswap {"service":"pathfinder"}
+debug: Added USDC-WETH on sushiswap {"service":"pathfinder"}
+debug: Added USDC-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added USDT-DAI on sushiswap {"service":"pathfinder"}
+debug: Added USDT-WETH on sushiswap {"service":"pathfinder"}
+debug: Added USDT-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added DAI-WETH on sushiswap {"service":"pathfinder"}
+debug: Added DAI-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added WETH-WBTC on sushiswap {"service":"pathfinder"}
+info: Found 15 pairs on sushiswap {"service":"pathfinder"}
+info: Scanning uniswapv3 for pairs... {"service":"pathfinder"}
+info: Found 0 pairs on uniswapv3 {"service":"pathfinder"}
+info: Scanning quickswap for pairs... {"service":"pathfinder"}
+debug: Added WMATIC-USDC on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-USDT on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-DAI on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-WETH on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-WBTC on quickswap {"service":"pathfinder"}
+debug: Added USDC-USDT on quickswap {"service":"pathfinder"}
+debug: Added USDC-DAI on quickswap {"service":"pathfinder"}
+debug: Added USDC-WETH on quickswap {"service":"pathfinder"}
+debug: Added USDC-WBTC on quickswap {"service":"pathfinder"}
+debug: Added USDT-DAI on quickswap {"service":"pathfinder"}
+debug: Added USDT-WETH on quickswap {"service":"pathfinder"}
+debug: Added USDT-WBTC on quickswap {"service":"pathfinder"}
+debug: Added DAI-WETH on quickswap {"service":"pathfinder"}
+debug: Added DAI-WBTC on quickswap {"service":"pathfinder"}
+debug: Added WETH-WBTC on quickswap {"service":"pathfinder"}
+info: Found 15 pairs on quickswap {"service":"pathfinder"}
+info: Token graph initialized with 6 tokens {"service":"pathfinder"}
+info: Fallback provider updated with 5 healthy providers
+warn: WebSocket provider not available, falling back to polling {"service":"market-watcher"}
+info: Polling watcher initialized (interval: 500000ms) {"service":"market-watcher"}
+info: Market watcher started at block 77400947 {"service":"market-watcher"}
+2025-10-08T06:17:24.226Z [info]:
+2025-10-08T06:17:24.227Z [info]: ============================================================
+2025-10-08T06:17:24.227Z [info]: 🤖 POLYGON ARBITRAGE BOT IS RUNNING
+2025-10-08T06:17:24.227Z [info]: ============================================================
+2025-10-08T06:17:24.227Z [info]: Mode: SIMULATE
+2025-10-08T06:17:24.228Z [info]: Time: 2025-10-08T06:17:24.228Z
+2025-10-08T06:17:24.228Z [info]: ============================================================
+2025-10-08T06:17:24.228Z [info]:
+debug: Provider health report: {"backup_1":{"blockNumber":77400950,"isHealthy":true,"lastCheck":"2025-10-08T06:17:30.900Z","latency":240},"backup_2":{"blockNumber":77400950,"isHealthy":true,"lastCheck":"2025-10-08T06:17:30.869Z","latency":209},"backup_3":{"blockNumber":77400950,"isHealthy":true,"lastCheck":"2025-10-08T06:17:31.078Z","latency":418},"backup_4":{"blockNumber":77400950,"isHealthy":true,"lastCheck":"2025-10-08T06:17:30.813Z","latency":153},"primary":{"blockNumber":77400950,"isHealthy":true,"lastCheck":"2025-10-08T06:17:31.066Z","latency":406}}
+debug: Provider health report: {"backup_1":{"blockNumber":77400964,"isHealthy":true,"lastCheck":"2025-10-08T06:18:00.879Z","latency":217},"backup_2":{"blockNumber":77400964,"isHealthy":true,"lastCheck":"2025-10-08T06:18:00.864Z","latency":202},"backup_3":{"blockNumber":77400964,"isHealthy":true,"lastCheck":"2025-10-08T06:18:01.054Z","latency":392},"backup_4":{"blockNumber":77400964,"isHealthy":true,"lastCheck":"2025-10-08T06:18:00.804Z","latency":142},"primary":{"blockNumber":77400964,"isHealthy":true,"lastCheck":"2025-10-08T06:18:00.979Z","latency":317}}
+2025-10-08T06:18:24.229Z [info]:
+2025-10-08T06:18:24.229Z [info]: 📊 Status Update (1 min uptime)
+2025-10-08T06:18:24.230Z [info]: Opportunities: 0 | Trades: 0 | Profit: $0.00
+2025-10-08T06:18:24.230Z [info]: Memory: 31.28 MB | Queue: 0
+debug: Provider health report: {"backup_1":{"blockNumber":77400978,"isHealthy":true,"lastCheck":"2025-10-08T06:18:30.915Z","latency":250},"backup_2":{"blockNumber":77400978,"isHealthy":true,"lastCheck":"2025-10-08T06:18:30.955Z","latency":290},"backup_3":{"blockNumber":77400978,"isHealthy":true,"lastCheck":"2025-10-08T06:18:30.994Z","latency":329},"backup_4":{"blockNumber":77400978,"isHealthy":true,"lastCheck":"2025-10-08T06:18:30.823Z","latency":158},"primary":{"blockNumber":77400978,"isHealthy":true,"lastCheck":"2025-10-08T06:18:31.090Z","latency":425}}
+debug: Provider health report: {"backup_1":{"blockNumber":77400991,"isHealthy":true,"lastCheck":"2025-10-08T06:19:00.917Z","latency":251},"backup_2":{"blockNumber":77400991,"isHealthy":true,"lastCheck":"2025-10-08T06:19:00.883Z","latency":217},"backup_3":{"blockNumber":77400991,"isHealthy":true,"lastCheck":"2025-10-08T06:19:00.992Z","latency":326},"backup_4":{"blockNumber":77400991,"isHealthy":true,"lastCheck":"2025-10-08T06:19:00.832Z","latency":166},"primary":{"blockNumber":77400991,"isHealthy":true,"lastCheck":"2025-10-08T06:19:01.074Z","latency":409}}
+2025-10-08T06:19:24.230Z [info]:
+2025-10-08T06:19:24.230Z [info]: 📊 Status Update (2 min uptime)
+2025-10-08T06:19:24.230Z [info]: Opportunities: 0 | Trades: 0 | Profit: $0.00
+2025-10-08T06:19:24.230Z [info]: Memory: 27.51 MB | Queue: 0
+debug: Provider health report: {"backup_1":{"blockNumber":77401007,"isHealthy":true,"lastCheck":"2025-10-08T06:19:31.125Z","latency":459},"backup_2":{"blockNumber":77401007,"isHealthy":true,"lastCheck":"2025-10-08T06:19:30.933Z","latency":267},"backup_3":{"blockNumber":77401007,"isHealthy":true,"lastCheck":"2025-10-08T06:19:31.031Z","latency":365},"backup_4":{"blockNumber":77401007,"isHealthy":true,"lastCheck":"2025-10-08T06:19:30.874Z","latency":208},"primary":{"blockNumber":77401007,"isHealthy":true,"lastCheck":"2025-10-08T06:19:31.115Z","latency":449}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401021,"isHealthy":true,"lastCheck":"2025-10-08T06:20:00.892Z","latency":226},"backup_2":{"blockNumber":77401021,"isHealthy":true,"lastCheck":"2025-10-08T06:20:00.934Z","latency":268},"backup_3":{"blockNumber":77401021,"isHealthy":true,"lastCheck":"2025-10-08T06:20:00.998Z","latency":330},"backup_4":{"blockNumber":77401021,"isHealthy":true,"lastCheck":"2025-10-08T06:20:00.842Z","latency":174},"primary":{"blockNumber":77401021,"isHealthy":true,"lastCheck":"2025-10-08T06:20:01.104Z","latency":438}}
+2025-10-08T06:20:24.230Z [info]:
+2025-10-08T06:20:24.230Z [info]: 📊 Status Update (3 min uptime)
+2025-10-08T06:20:24.231Z [info]: Opportunities: 0 | Trades: 0 | Profit: $0.00
+2025-10-08T06:20:24.231Z [info]: Memory: 28.22 MB | Queue: 0
+^C2025-10-08T06:20:30.120Z [info]: Received SIGINT
+2025-10-08T06:20:30.121Z [info]: 📛 Shutting down...
+info: Stopping market watcher... {"service":"market-watcher"}
+info: Market watcher stopped {"service":"market-watcher"}
+2025-10-08T06:20:30.122Z [info]: 👋 Shutdown complete
+
+
+┌──(root㉿uncleNickypoo)-[/home/nickypoo/secret_weapon]
+└─# EXECUTOR_MODE=live npm start
+
+> polygon-arbitrage-bot@1.0.0 start
+> node dist/main.js
+
+error: No healthy providers available!
+info: Provider manager initialized
+error: No healthy providers available!
+warn: No healthy providers, using primary provider
+info: Wallet initialized from private key: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb
+2025-10-08T06:20:46.153Z [info]: 🚀 Initializing Polygon Arbitrage Bot...
+2025-10-08T06:20:46.154Z [info]: 📊 Connecting to database...
+query: SELECT version()
+query: SELECT * FROM current_schema()
+query: START TRANSACTION
+query: SELECT * FROM "information_schema"."tables" WHERE "table_schema" = 'public' AND "table_name" = 'typeorm_metadata'
+query: COMMIT
+2025-10-08T06:20:46.220Z [info]: ✅ Database connected
+2025-10-08T06:20:46.221Z [warn]: Ledger not initialized:
+2025-10-08T06:20:46.221Z [info]: 🌐 Initializing blockchain providers...
+2025-10-08T06:20:46.221Z [info]: ✅ Providers initialized
+2025-10-08T06:20:46.221Z [info]: 💰 Verifying wallet...
+error: No healthy providers available!
+warn: No healthy providers, using primary provider
+2025-10-08T06:20:46.643Z [info]: 📍 Wallet Address: 0x6d3D531699b801587f039fb2a766c9E5Ef9E52cb
+2025-10-08T06:20:46.643Z [info]: 💎 MATIC Balance: 0.0
+2025-10-08T06:20:46.644Z [info]: ✅ Wallet verified
+2025-10-08T06:20:46.644Z [info]: 📜 Checking smart contract...
+2025-10-08T06:20:46.644Z [warn]: ⚠️  Contract manager not available - skipping contract verification
+2025-10-08T06:20:46.645Z [info]: 🔧 Starting services...
+2025-10-08T06:20:46.653Z [info]: ✅ Metrics service started
+2025-10-08T06:20:46.654Z [info]: ✅ Health API started
+info: Daily metrics will reset in 1059 minutes {"service":"risk-manager"}
+2025-10-08T06:20:46.656Z [info]: ✅ Market watcher initialized
+2025-10-08T06:20:46.656Z [info]: ✨ Initialization complete!
+2025-10-08T06:20:46.656Z [info]:
+2025-10-08T06:20:46.657Z [info]: 📈 Current Status:
+2025-10-08T06:20:46.657Z [info]: ────────────────────────────────────────
+2025-10-08T06:20:46.657Z [info]: Mode: live
+2025-10-08T06:20:46.657Z [info]: Circuit Breaker: 🟢 OK
+2025-10-08T06:20:46.657Z [info]: Daily P&L: $0.00
+2025-10-08T06:20:46.657Z [info]: Daily Trades: 0
+2025-10-08T06:20:46.657Z [info]: Enabled DEXes: sushiswap, uniswapv3, quickswap
+2025-10-08T06:20:46.657Z [info]: ────────────────────────────────────────
+2025-10-08T06:20:46.657Z [info]:
+2025-10-08T06:20:46.657Z [info]: 🏁 Starting arbitrage bot...
+info: Starting market watcher... {"service":"market-watcher"}
+info: Initializing pathfinder token graph... {"service":"pathfinder"}
+info: Fallback provider updated with 5 healthy providers
+info: Initialized SushiSwap adapter {"service":"dex-router-adapter"}
+info: Initialized UniswapV3 adapter {"service":"dex-router-adapter"}
+info: Initialized QuickSwap adapter {"service":"dex-router-adapter"}
+info: Checking 6 tokens across 3 DEXs {"service":"pathfinder"}
+info: Scanning sushiswap for pairs... {"service":"pathfinder"}
+info: Metrics server started on port 9090 {"service":"metrics"}
+info: Prometheus metrics available at http://localhost:9090/metrics {"service":"metrics"}
+info: Health API started on port 3000 {"service":"health-api"}
+info: Health check: http://localhost:3000/health {"service":"health-api"}
+debug: Added WMATIC-USDC on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-USDT on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-DAI on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-WETH on sushiswap {"service":"pathfinder"}
+debug: Added WMATIC-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added USDC-USDT on sushiswap {"service":"pathfinder"}
+debug: Added USDC-DAI on sushiswap {"service":"pathfinder"}
+debug: Added USDC-WETH on sushiswap {"service":"pathfinder"}
+debug: Added USDC-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added USDT-DAI on sushiswap {"service":"pathfinder"}
+debug: Added USDT-WETH on sushiswap {"service":"pathfinder"}
+debug: Added USDT-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added DAI-WETH on sushiswap {"service":"pathfinder"}
+debug: Added DAI-WBTC on sushiswap {"service":"pathfinder"}
+debug: Added WETH-WBTC on sushiswap {"service":"pathfinder"}
+info: Found 15 pairs on sushiswap {"service":"pathfinder"}
+info: Scanning uniswapv3 for pairs... {"service":"pathfinder"}
+info: Found 0 pairs on uniswapv3 {"service":"pathfinder"}
+info: Scanning quickswap for pairs... {"service":"pathfinder"}
+debug: Added WMATIC-USDC on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-USDT on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-DAI on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-WETH on quickswap {"service":"pathfinder"}
+debug: Added WMATIC-WBTC on quickswap {"service":"pathfinder"}
+debug: Added USDC-USDT on quickswap {"service":"pathfinder"}
+debug: Added USDC-DAI on quickswap {"service":"pathfinder"}
+debug: Added USDC-WETH on quickswap {"service":"pathfinder"}
+debug: Added USDC-WBTC on quickswap {"service":"pathfinder"}
+debug: Added USDT-DAI on quickswap {"service":"pathfinder"}
+debug: Added USDT-WETH on quickswap {"service":"pathfinder"}
+debug: Added USDT-WBTC on quickswap {"service":"pathfinder"}
+debug: Added DAI-WETH on quickswap {"service":"pathfinder"}
+debug: Added DAI-WBTC on quickswap {"service":"pathfinder"}
+debug: Added WETH-WBTC on quickswap {"service":"pathfinder"}
+info: Found 15 pairs on quickswap {"service":"pathfinder"}
+info: Token graph initialized with 6 tokens {"service":"pathfinder"}
+info: Fallback provider updated with 5 healthy providers
+warn: WebSocket provider not available, falling back to polling {"service":"market-watcher"}
+info: Polling watcher initialized (interval: 500000ms) {"service":"market-watcher"}
+info: Market watcher started at block 77401053 {"service":"market-watcher"}
+2025-10-08T06:21:06.840Z [info]:
+2025-10-08T06:21:06.840Z [info]: ============================================================
+2025-10-08T06:21:06.841Z [info]: 🤖 POLYGON ARBITRAGE BOT IS RUNNING
+2025-10-08T06:21:06.841Z [info]: ============================================================
+2025-10-08T06:21:06.841Z [info]: Mode: LIVE
+2025-10-08T06:21:06.841Z [info]: Time: 2025-10-08T06:21:06.841Z
+2025-10-08T06:21:06.841Z [info]: ============================================================
+2025-10-08T06:21:06.842Z [info]:
+debug: Provider health report: {"backup_1":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.112Z","latency":133},"backup_2":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.097Z","latency":118},"backup_3":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.287Z","latency":308},"backup_4":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.119Z","latency":140},"primary":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.079Z","latency":101}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.112Z","latency":133},"backup_2":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.097Z","latency":118},"backup_3":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.287Z","latency":308},"backup_4":{"blockNumber":77401055,"isHealthy":true,"lastCheck":"2025-10-08T06:21:16.166Z","latency":187},"primary":{"blockNumber":77401051,"isHealthy":true,"lastCheck":"2025-10-08T06:21:06.079Z","latency":101}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401066,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.339Z","latency":359},"backup_2":{"blockNumber":77401066,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.173Z","latency":193},"backup_3":{"blockNumber":77401065,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.297Z","latency":317},"backup_4":{"blockNumber":77401065,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.122Z","latency":142},"primary":{"blockNumber":77401065,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.380Z","latency":400}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401071,"isHealthy":true,"lastCheck":"2025-10-08T06:21:46.203Z","latency":222},"backup_2":{"blockNumber":77401071,"isHealthy":true,"lastCheck":"2025-10-08T06:21:46.192Z","latency":211},"backup_3":{"blockNumber":77401065,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.297Z","latency":317},"backup_4":{"blockNumber":77401071,"isHealthy":true,"lastCheck":"2025-10-08T06:21:46.127Z","latency":146},"primary":{"blockNumber":77401065,"isHealthy":true,"lastCheck":"2025-10-08T06:21:36.380Z","latency":400}}
+2025-10-08T06:22:06.843Z [info]:
+2025-10-08T06:22:06.843Z [info]: 📊 Status Update (1 min uptime)
+2025-10-08T06:22:06.843Z [info]: Opportunities: 0 | Trades: 0 | Profit: $0.00
+2025-10-08T06:22:06.844Z [info]: Memory: 35.02 MB | Queue: 0
+debug: Provider health report: {"backup_1":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.209Z","latency":228},"backup_2":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.235Z","latency":254},"backup_3":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.294Z","latency":313},"backup_4":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.132Z","latency":151},"primary":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.376Z","latency":395}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.209Z","latency":228},"backup_2":{"blockNumber":77401085,"isHealthy":true,"lastCheck":"2025-10-08T06:22:16.217Z","latency":236},"backup_3":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.294Z","latency":313},"backup_4":{"blockNumber":77401085,"isHealthy":true,"lastCheck":"2025-10-08T06:22:16.137Z","latency":155},"primary":{"blockNumber":77401080,"isHealthy":true,"lastCheck":"2025-10-08T06:22:06.376Z","latency":395}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.204Z","latency":223},"backup_2":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.181Z","latency":200},"backup_3":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.424Z","latency":443},"backup_4":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.214Z","latency":233},"primary":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.417Z","latency":436}}
+debug: Provider health report: {"backup_1":{"blockNumber":77401099,"isHealthy":true,"lastCheck":"2025-10-08T06:22:46.222Z","latency":240},"backup_2":{"blockNumber":77401099,"isHealthy":true,"lastCheck":"2025-10-08T06:22:46.196Z","latency":214},"backup_3":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.424Z","latency":443},"backup_4":{"blockNumber":77401099,"isHealthy":true,"lastCheck":"2025-10-08T06:22:46.136Z","latency":154},"primary":{"blockNumber":77401094,"isHealthy":true,"lastCheck":"2025-10-08T06:22:36.417Z","latency":436}}
+2025-10-08T06:23:06.844Z [info]:
+2025-10-08T06:23:06.844Z [info]: 📊 Status Update (2 min uptime)
+2025-10-08T06:23:06.844Z [info]: Opportunities: 0 | Trades: 0 | Profit: $0.00
+2025-10-08T06:23:06.844Z [info]: Memory: 28.64 MB | Queue: 0
+^C2025-10-08T06:23:13.280Z [info]: Received SIGINT
+2025-10-08T06:23:13.280Z [info]: 📛 Shutting down...
+info: Stopping market watcher... {"service":"market-watcher"}
+info: Market watcher stopped {"service":"market-watcher"}
+2025-10-08T06:23:13.281Z [info]: 👋 Shutdown complete

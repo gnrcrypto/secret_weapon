@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Arbitrage Bot Metrics
+  - job_name: 'arbitrage-bot'
+    static_configs:
+      - targets: ['host.docker.internal:9090']
+        labels:
+          service: 'arbitrage-bot'
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Node Exporter (optional - for system metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+        labels:
+          service: 'node-exporter'
+
+  # Postgres Exporter (optional - for database metrics)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+
+  # Redis Exporter (optional - for cache metrics)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
